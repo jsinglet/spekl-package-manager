@@ -1,0 +1,13 @@
+#
+# Basic Project Information
+#
+name            : adf
+project-id      : adf
+version         : aaaa
+contribute-specs: TRUE
+
+#
+# Checks
+#
+# hint: Use spm add <your-tool> to add new checks here
+#

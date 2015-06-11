@@ -1,0 +1,37 @@
+#
+# Basic Project Information
+#
+name            : My Awesome Project
+project-id      : my.test.project
+version         : 0.1
+contribute-specs: true
+
+#
+# Repository that talks the Spekl
+# It's possible that other people might want to add their own that talks the spekl protocol
+#
+spekls:
+  - http://spekl.org
+  
+#
+# Tools
+#
+
+checks : 
+  - name        : "OpenJML All File RAC"
+    language    : java              # might not need this, because it is implied by the tool
+    paths       : [src/**.java]
+
+    tool: 
+      name      : openjml
+      version   : 1.1.12
+      args      : -rac
+      flags     : "enable_esc, disable_xyz"
+      pre_check :  # stuff to do before a check
+      post_check: # stuff to do before a check
+
+    specs:
+      - java-core: 1.1.2
+
+
+        

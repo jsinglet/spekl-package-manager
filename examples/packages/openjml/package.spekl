@@ -1,0 +1,29 @@
+name   : openjml
+version: 1.1.2
+
+requires :
+    - asset: MAIN
+      url: http://www.openjml.org/downloads/1.1.2.tar.gz # MAIN will point to a downloaded asset
+      platform: all
+    - option:
+        - package: z3
+          version: 1.1.2
+          platform: all
+        - package: why3
+          version: 1.1.2
+          platform: all
+        
+assumes:
+  - cmd: java --version
+    contains: 1.7
+    message: "Sorry, but this package requires Java, version 1.7 or higher."
+
+
+# downloads everything to the .
+install:
+  - cmd: tar zxvf $MAIN
+    platform: all
+  - cmd: tar zxvf $MAIN
+    platform: windows
+    
+  
