@@ -1,5 +1,5 @@
-name   : ${project-name}          # name of the package
-version: ${project-version}       # version of the package
+name   : ${project_name}          # name of the package
+version: ${project_version}       # version of the package
 kind   : tool                     # one of tool or spec(s)
 
 # a list of the named and versioned packages that must be installed before
