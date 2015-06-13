@@ -28,19 +28,21 @@
 ;;
 ;; 
 ;;
+
+
 (defn init-project-with-config [project-file]
   (log/info "[new-project]" "Writing project file to spekl.yml")
-  (spit const/project-filename project-file)
+  (spit (const/project-filename) project-file)
   (log/info "[new-project]" "Done."))
 
 (defn init-tool-with-config [project-file]
-  (log/info "[new-tool]" "Writing configuration file to package.yml")
-  (spit const/package-filename project-file)
+  (log/info "[new-tool]" "Writing configuration file to package.yml" const/package-filename)
+  (spit (const/package-filename) project-file)
   (log/info "[new-tool]" "Done."))
 
 (defn init-spec-with-config [project-file]
   (log/info "[new-spec]" "Writing configuration file to package.yml")
-  (spit const/package-filename project-file)
+  (spit (const/package-filename) project-file)
   (log/info "[new-spec]" "Done."))
 
 
@@ -101,11 +103,12 @@
 
 
 
-(defn run [arguments]
+(defn run [arguments options]
   (log/info "[command-init]")
   (case (first arguments)
     "specs" (run-spec (rest arguments))
-    "spec" (run-spec (rest arguments))
+    "spec"  (run-spec (rest arguments))
     "tool"  (run-tool (rest arguments))
+    "project"  (run-tool (rest arguments))
     (run-project (rest arguments))))
 

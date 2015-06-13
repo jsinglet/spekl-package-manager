@@ -21,11 +21,11 @@
   (:require [clojure.tools.cli :refer [parse-opts]]
             [clojure.string :as string]
             [spekl-package-manager.command-init :as command-init]
+            [spekl-package-manager.command-list :as command-list]
+            [spekl-package-manager.command-install :as command-install]
+            [clojure.java.io :as io]
+            [spekl-package-manager.runtime :as rt]
             )
-
-  (:import jline.Terminal)
-
-  
   (:gen-class))
 
 
@@ -36,24 +36,43 @@
   [& args]
   (run args))
 
-
 (defn usage [options-summary]
-  (->> ["spm: a tool for writing and using program specifications."
+  (->> [
+        (slurp (.getFile (io/resource "banner.txt")))
+        "spm: a tool for writing and using program specifications."
         ""
         "Usage: spm [options] action"
         ""
         "Options:"
         options-summary
         ""
-        "Actions:"
+        "General Actions:"
         "  install  Install any required specs and tools for this project"
-        "  add      Adds specs or tools to this project                  "
-        "  remove   Removes specs or tools from this project             "
-        "  init     Create a new spekl file (specs | tool)"
-        "  list     Print some information about this project (tools | specs)"
+        "  help     Displays this message"
+        ""
+        "Check-Related Actions:"
+        "  add      Adds a new check to this project                     "
+        "  remove   Removes a named check from this project              "
         "  check    Run the configured tools on the current project"
+        ""
+        "Specification-Related Actions:"
+        "  attach   Attaches a named specification to this project       "
+        "  release  Unattaches a named specification from this project   "
+        "  refresh  Checks the central repository for updates to any atttached specifications"
         "  find     Searches spekl for specification libraries that might work for your current project"
-        "  update   Refresh the specifications attached to this project"
+        ""
+        "Project-Related Actions:"
+        "  init     Create a new Spekl project. May be one of: "
+        "             project     Creates a new project that you can attach specs and checks to (default)"
+        "             tool        Creates a new project for building a Spekl tool/check"
+        "             specs       Creates a new project for writing a Spekl specification library."
+        ""
+        "Package Management Actions:"
+        "  list     Displays a list of available tools and specification libraries. May be one of:"
+        "             all         Displays a list of all specs and tools in one listing (default)"
+        "             specs       Displays a list of available specification libraries."
+        "             tools       Displays a list of available verification tools (checks)."
+        ""
         "  publish  Contribute back the specs you've written for this project."
         ""
         "For more information please see http://spekl.org/docs."]
@@ -68,6 +87,12 @@
     :default 80
     :parse-fn #(Integer/parseInt %)
     :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
+
+   ["-d" "--dir DIRECTORY" "The effective project directory. Defaults to the current directory."
+    :id :directory
+    :default "."
+    ]
+
    ;; A non-idempotent option
    ["-v" nil "Verbosity level"
     :id :verbosity
@@ -81,13 +106,23 @@
   (println msg)
   );;(System/exit status))
 
+
+(defn setup-local-env [options]
+  (do
+    (rt/set-working-directory (options :directory))
+    ))
+
 (defn run [args]
   ;; TODO: install, info, check, update, publish
   (let [{:keys [options arguments errors summary]} (parse-opts args spekl-options)]
-    (case (first arguments)
-      "init"    (command-init/run (rest arguments))
-      "install" (not-implemented)
-      (exit 1 (usage summary))
-    )))
-
-
+    (do
+      (setup-local-env options)
+      (try 
+        (case (first arguments)
+          "init"    (command-init/run (rest arguments) options)
+          "list"    (command-list/run (rest arguments))
+          "install" (command-install/run (rest arguments) options)
+          "help"    (exit 0 (usage summary))
+          (exit 1 (usage summary)))
+        (catch IllegalArgumentException e (exit 1 (usage summary))))
+      )))
