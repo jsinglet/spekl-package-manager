@@ -4,5 +4,5 @@
 
 (defn project-filename [] (str (rt/working-dir) "spekl.yml"))
 (defn package-filename [] (str (rt/working-dir) "package.yml"))
-(defn package-directory [] (str (rt/working-dir) ".spekl"))
+(defn package-directory [] (str (rt/working-dir) ".spm"))
 

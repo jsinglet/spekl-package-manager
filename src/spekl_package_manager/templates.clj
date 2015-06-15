@@ -14,7 +14,7 @@
 (defn load-ftl-resource
   "Gets the template data from the resources directory for the given file"
   [template]
-  (slurp (.getFile (io/resource (str template ".ftl")))))
+  (slurp (io/resource (str template ".ftl"))))
 
 (defn load-template [template]
   (Template. "name" (StringReader. (load-ftl-resource template)) ftl-configuration))

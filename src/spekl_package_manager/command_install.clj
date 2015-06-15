@@ -2,6 +2,7 @@
   (:require [clj-yaml.core :as yaml]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
+            [spekl-package-manager.util :as util]
             [spekl-package-manager.constants :as constants]))
 
 (defn read-local-conf
@@ -116,7 +117,7 @@
   (log/info "[command-install] Starting install of package" (package-name-version package-description))
 
   (do
-    ;; Step 1: install anything it depends on (these will always fetch from remote)
+    ;; Step 0: install anything it depends on (these will always fetch from remote)
     (log/info "[command-install] Examining dependencies...")
     (let [deps (gather-deps package-description)]
       (let [missing-deps (gather-missing-deps (deps :all-deps))]
@@ -128,6 +129,22 @@
         ))
     
     (log/info "[command-install] Installing package" (package-name-version package-description))
+
+    ;; Step 1: If it doesn't exist, create the .spm directory
+    (util/create-dir-if-not-exists (constants/package-directory))
+
+    ;; Step 2: Download all the required assets
+
+    ;; Step 3: Run the installation commands
+    ;;
+    ;; Baked into the assumptions for these commands is the following:
+    ;;
+    ;;
+    ;; 1) All assets will be located in a directory .spm/<package-name>/
+    ;; 2) The current working directory of every command will be .spm/<package-name>/
+    ;; 3) After installation, all files downloaded will be deleted.
+    ;; 4)
+
     )
   
   )
@@ -145,7 +162,7 @@
 
 ;;(> (count (gather-missing-deps ((gather-deps (accuire-remote-package "openjml" nil)) :all-deps))) 1)
 
-(install-package (accuire-remote-package "openjml" nil))
+;(install-package (accuire-remote-package "openjml" nil))
 
 
 

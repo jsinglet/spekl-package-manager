@@ -7,10 +7,10 @@ abstract: YES                  # indicates this can't be directly run
 
 # a list of the named and versioned packages that must be installed before
 # installing 
-depends:                               
-  - package   : openjml   # represents a package that MUST be installed
-    version   : 1.1.1
-    platform  : all 
+#depends:
+#  - package   : openjml   # represents a package that MUST be installed
+#    version   : 1.1.1
+#    platform  : all
   # - package   : other-package
   #   version   : 1.1.1
   # - one-of:                     # at least one of these must be installed  

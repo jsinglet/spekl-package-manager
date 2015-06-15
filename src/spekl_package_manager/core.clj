@@ -25,6 +25,8 @@
             [spekl-package-manager.command-install :as command-install]
             [clojure.java.io :as io]
             [spekl-package-manager.runtime :as rt]
+            [spekl-package-manager.progress :as pr]
+
             )
   (:gen-class))
 
@@ -38,7 +40,7 @@
 
 (defn usage [options-summary]
   (->> [
-        (slurp (.getFile (io/resource "banner.txt")))
+        (slurp  (io/resource "banner.txt"))
         "spm: a tool for writing and using program specifications."
         ""
         "Usage: spm [options] action"
@@ -122,6 +124,7 @@
           "init"    (command-init/run (rest arguments) options)
           "list"    (command-list/run (rest arguments))
           "install" (command-install/run (rest arguments) options)
+          "stuff"   (pr/silly-loop)
           "help"    (exit 0 (usage summary))
           (exit 1 (usage summary)))
         (catch IllegalArgumentException e (exit 1 (usage summary))))

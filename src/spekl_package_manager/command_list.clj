@@ -5,7 +5,7 @@
 (defn run-specs [packages]
   (doseq [x packages] (println
                        (format "(%s) %-10s - %s" (x "kind") (x "name")  (x "description")))))
-
+ 
 (defn run-tools [packages]
   (doseq [x packages] (println
                        (format "(%s)  %-10s - %s" (x "kind") (x "name")  (x "description")))))

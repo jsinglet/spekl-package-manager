@@ -12,7 +12,7 @@
 
 
 (defn load-packages [subset]
-  (let [all (json/read-str (slurp (.getFile (io/resource "static-package-list.json"))))]
+  (let [all (json/read-str (slurp (io/resource "static-package-list.json")))]
     (case subset
       :all all
       :specs (filter (fn [x] (= (x "kind") "specs")) all)
