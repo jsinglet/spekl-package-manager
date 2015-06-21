@@ -17,6 +17,7 @@
   ([package] (read-local-conf (.getFile (io/resource (str "packages/" package ".yml")))))
   )
 
+
 (defn accuire-remote-package [package version]
   (log/info "[command-install] Finding package" package "in remote repository")
   ;; TODO replace with remote file reading.
@@ -153,19 +154,19 @@
     (util/create-dir-if-not-exists (constants/package-directory))
 
     (util/create-dir-if-not-exists (constants/package-directory))
-
+ 
 
     (log/info "[command-install] Downloading Required Assets... ")
 
     ;; Step 2: Download all the required assets
-    (let [assets (extract-assets package-description)]
+    (log/info (let [assets (extract-assets package-description)]
       (map (fn [x]
              {
               :local-file  (download/download-to (x :name) (x :url) (make-asset-path (package-name package-description) (x :asset)))
               :symbol-name (x :asset)
               })
            assets)
-      )
+      ))
 
     ;; Step 3: Run the installation commands
     ;;
@@ -188,6 +189,8 @@
     nil (install-package (accuire-local-package))                        ;; install using the package.yml in the current working directory
     (install-package (accuire-remote-package what (rest arguments)))     ;; download the package description and install it.
   )))
+
+
 
 
 
