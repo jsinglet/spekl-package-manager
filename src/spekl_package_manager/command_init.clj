@@ -36,7 +36,7 @@
   (log/info "[new-project]" "Done."))
 
 (defn init-tool-with-config [project-file]
-  (log/info "[new-tool]" "Writing configuration file to package.yml" const/package-filename)
+  (log/info "[new-tool]" "Writing configuration file to package.yml")
   (spit (const/package-filename) project-file)
   (log/info "[new-tool]" "Done."))
 

@@ -22,7 +22,8 @@ depends:
 
 assets:
   - asset   : MAIN
-    url     : http://www.openjml.org/downloads/1.1.2.tar.gz  
+    name    : openjml-source
+    url     : http://jmlspecs.sourceforge.net/openjml.zip
     platform: all
         
 assumes:
@@ -32,8 +33,8 @@ assumes:
 
 
 # downloads everything to the .
-# install:
-#   - cmd: tar zxvf $MAIN
-#     platform: all
-#   - cmd: tar zxvf $MAIN
-#     platform: windows
+install:
+  - cmd: tar -zxvf $MAIN
+    platform: all
+  - cmd: tar zxvf $MAIN
+     platform: windows

@@ -3,7 +3,9 @@
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [spekl-package-manager.util :as util]
-            [spekl-package-manager.constants :as constants]))
+            [spekl-package-manager.constants :as constants]
+            [spekl-package-manager.download :as download]
+            ))
 
 (defn read-local-conf
   [file-name]
@@ -19,11 +21,11 @@
   (log/info "[command-install] Finding package" package "in remote repository")
   ;; TODO replace with remote file reading.
   (case version
-    nil   (read-remote-conf package)
+    '()   (read-remote-conf package)
     (read-remote-conf package version)
     ))
 
-;; install the current directory's package or proces the spekl.yml file
+;; install the current directory's package or proces the spekl.yml  file
 (defn accuire-local-package []
   (if (.exists (io/as-file (constants/project-filename)))
     (do
@@ -98,8 +100,9 @@
 (defn gather-missing-deps [deps]
   (filter (fn [x] (not (installed? (x :package) (x :version)))) deps))
 
-
-
+(defn extract-assets [package-description]
+  (let [assets (package-description :assets)]
+    (filter (fn [x] (my-platform? x)) assets)))
 
 (defn package-name [package-description]
   (if (= nil (package-description :name))
@@ -112,6 +115,22 @@
 (defn print-missing-deps [deps]
   (log/info "[command-install] Will install the following missing packages:")
   (doseq [x deps] (log/info "[command-install] - " (package-name-version x))))
+
+
+(defn make-package-path [package-description]
+  (.getPath (io/file (constants/package-directory) (str (package-name package-description) (package-description :version))))
+                     )
+(defn make-asset-path [package asset]
+  (.getPath (io/file (constants/package-directory) (str package "-" asset)))
+  )
+
+
+(defn create-needed-dirs [package-description]
+  (do
+    (util/create-dir-if-not-exists (constants/package-directory))
+    (util/create-dir-if-not-exists (make-package-path package-description))
+    )
+  )
 
 (defn install-package [package-description]
   (log/info "[command-install] Starting install of package" (package-name-version package-description))
@@ -130,17 +149,30 @@
     
     (log/info "[command-install] Installing package" (package-name-version package-description))
 
-    ;; Step 1: If it doesn't exist, create the .spm directory
+    ;; Step 1: Directories. Create the .spm and package directory where we will do our work
     (util/create-dir-if-not-exists (constants/package-directory))
 
+    (util/create-dir-if-not-exists (constants/package-directory))
+
+
+    (log/info "[command-install] Downloading Required Assets... ")
+
     ;; Step 2: Download all the required assets
+    (let [assets (extract-assets package-description)]
+      (map (fn [x]
+             {
+              :local-file  (download/download-to (x :name) (x :url) (make-asset-path (package-name package-description) (x :asset)))
+              :symbol-name (x :asset)
+              })
+           assets)
+      )
 
     ;; Step 3: Run the installation commands
     ;;
     ;; Baked into the assumptions for these commands is the following:
     ;;
     ;;
-    ;; 1) All assets will be located in a directory .spm/<package-name>/
+    ;; 1) All assets will be located in a directory .spm/<package-name>-<asset-name>/
     ;; 2) The current working directory of every command will be .spm/<package-name>/
     ;; 3) After installation, all files downloaded will be deleted.
     ;; 4)
@@ -151,7 +183,6 @@
 
 
 (defn run [arguments options]
-  (log/info "[command-install]")
   (let [what (first arguments)]
   (case what
     nil (install-package (accuire-local-package))                        ;; install using the package.yml in the current working directory
@@ -162,8 +193,16 @@
 
 ;;(> (count (gather-missing-deps ((gather-deps (accuire-remote-package "openjml" nil)) :all-deps))) 1)
 
-;(install-package (accuire-remote-package "openjml" nil))
 
 
+;(let [package-description (accuire-remote-package "openjml" '())]
+;  (let [downloads (map (fn [x] {
+;                                :local-file (download/download-to (x :name) (x :url) (make-asset-path (package-name package-description) (x :asset)))
+;                                :symbol-name (x :asset)
+;                                } ) (extract-assets package-description))]
+;     downloads
+;   ))
 
+  
 
+;(= '() null)

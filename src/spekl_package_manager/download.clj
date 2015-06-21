@@ -1,8 +1,8 @@
 (ns spekl-package-manager.download
-  (:require [clj-http.client :as client]))
+  (:import (org.spekl.spm.utils ProgressableFileDownload)))
 
 
-( (client/get "http://jmlspecs.sourceforge.net/openjml.zip") :headers)
-
-
-;;((client/get "http://www.google.com") :headers)
+(defn download-to [label url where]
+  (let [the-file (ProgressableFileDownload. label url where )]
+    (.download the-file)
+    ))
