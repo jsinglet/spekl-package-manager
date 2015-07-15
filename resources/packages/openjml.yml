@@ -26,15 +26,17 @@ assets:
     url     : http://jmlspecs.sourceforge.net/openjml.zip
     platform: all
         
-#assumes:
-#  - cmd: java --version # right now just support cmd -- maybe file exists?
-#    contains: 1.7
-# #   message: "Sorry, but this package requires Java, version 1.7 or higher."
+# assumes:
+#   - cmd: java --version # right now just support cmd -- maybe file exists?
+#     contains: 1.7
+#     message: "Sorry, but this package requires Java, version 1.7 or higher."
 
 
 # downloads everything to the .
-#install:
-#  - cmd: tar -zxvf $MAIN
-#    platform: all
-#  - cmd: tar zxvf $MAIN
-#     platform: windows
+install:
+  - cmd: tar -zxvf $MAIN
+    description: Unpacking the archive...
+    platform: all
+  - cmd: tar zxvf $MAIN
+    description: Unpacking the archive...
+    platform: windows

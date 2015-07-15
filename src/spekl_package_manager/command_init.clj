@@ -109,6 +109,6 @@
     "specs" (run-spec (rest arguments))
     "spec"  (run-spec (rest arguments))
     "tool"  (run-tool (rest arguments))
-    "project"  (run-tool (rest arguments))
+    "project"  (run-project (rest arguments))
     (run-project (rest arguments))))
 
