@@ -5,16 +5,16 @@ kind   : tool                     # one of tool or spec(s)
 # a list of the named and versioned packages that must be installed before
 # installing 
 depends:                               
-  - package   : other-package   # represents a package that MUST be installed
-    version   : 1.1.1
-    platform  : all 
-#   - one-of:                     # at least one of these must be installed  
-#       - package: z3
-#         version: 1.1.2
-#         platform: all
-#       - package: why3
-#         version: 1.1.2
-#         platform: all
+  # - package   : other-package   # represents a package that MUST be installed
+  #   version   : 1.1.1
+  #   platform  : all 
+  - one-of:                     # at least one of these must be installed  
+    - package: other-package
+      version: 1.1.1
+      platform: all
+    - package: why3
+      version: 1.1.2
+      platform: all
 
 #
 # assets that make up THIS package
@@ -37,6 +37,9 @@ assets:
 install:
   - cmd: tar -zxvf MAIN
     description: Unpacking the archive...
+    platform: all
+  - cmd: touch openjml.properties
+    description: Creating default properties file...
     platform: all
   - cmd: ls -al MAIN
     description: Unpacking the archive...

@@ -84,7 +84,8 @@
           (filter (fn [xx] (my-platform? xx)) (x :one-of)))) one-ofs))
 
 (defn installed? [package version]
-  (.exists (io/file (constants/package-directory) (str package "-" version))))
+  (.exists (io/file (constants/package-directory) (str package "-" version) (constants/package-filename) )))
+
 
 (defn gather-deps [package-description ]
   (let [package-depends  (package-description :depends)]
@@ -120,6 +121,8 @@
   (.getPath (io/file (constants/package-directory) (str (package-name package-description) "-" (package-description :version))))
   )
 
+
+
 (defn ext-or-nil [ext]
   (if (= ext nil)
     nil
@@ -140,5 +143,17 @@
   (do
     (util/create-dir-if-not-exists (constants/package-directory))
     (util/create-dir-if-not-exists (make-package-path package-description))
+    )
+  )
+
+
+(defn make-package-file-path [package-description]
+  (.getPath (io/file (constants/package-directory) (str (package-name package-description) "-" (package-description :version)) (constants/package-filename) ))
+  )
+
+
+(defn write-description [package-description]
+  (let [destination (make-package-file-path package-description)]
+    (spit destination (yaml/generate-string package-description))
     )
   )

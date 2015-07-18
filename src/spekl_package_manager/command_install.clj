@@ -84,6 +84,10 @@
           ;; Step 4: Cleanup any downloaded files.
           (log/info "[command-install] Performing cleanup tasks...")
           (cleanup-files assetenv)
+          ;; Step 5: Write out package description
+          (log/info "[command-install] Writing out package description...")
+          (package/write-description package-description)
+          
           )
         (log/info "[command-install] Completed installation of package" (package/package-name-version package-description))
       ))
