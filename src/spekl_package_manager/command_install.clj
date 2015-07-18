@@ -14,9 +14,27 @@
   (doseq [x deps] (log/info "[command-install] - " (package/package-name-version x))))
 
 (defn run-install-script [package-description asset-env]
-  (let [install-script (package/gather-install-commands)]
-    
-    ))
+  (let [install-script (package/gather-install-commands package-description)]
+    (doall     
+     (map (fn [x]
+            (log/info "[command-install-scripts] " (x :description) "[" (x :cmd) " =>" (util/command-to-spm-cmd asset-env (x :cmd)) "]")
+            ;; note here that "dir" is optional and defaults to the .spm directory
+            (util/execute-command-in-directory asset-env (x :cmd) (str (package/make-package-path package-description) (x :dir)))
+            ) install-script))))
+
+
+(defn cleanup-files [assetenv]
+  (doall (map (fn [x]
+                (log/info "[command-install] Cleaning up resources for asset " (x :name) "[will delete: " (x :real-path) "]")
+                (io/delete-file (x :real-path))
+                ) assetenv))
+  )
+(defn indent-line [level]
+  (if (= nil level)
+    ""
+    (apply str (repeat (* 5 level) "-"))
+    )
+  )
 
 (defn install-package [package-description]
   (log/info "[command-install] Starting install of package" (package/package-name-version package-description))
@@ -36,39 +54,46 @@
     (log/info "[command-install] Installing package" (package/package-name-version package-description))
 
     ;; Step 1: Directories. Create the .spm and package directory where we will do our work
-    (util/create-dir-if-not-exists (constants/package-directory))
-
-    (util/create-dir-if-not-exists (constants/package-directory))
-
-
+    (package/create-needed-dirs package-description)
+    
     (log/info "[command-install] Downloading Required Assets... ")
 
     ;; Step 2: Download all the required assets
     (let [assets (package/extract-assets package-description)]
-      (let [assetenv (map (fn [x]
-             {
-              :local-file  (download/download-to (x :name) (x :url) (package/make-asset-path (package/package-name package-description) (x :asset)))
-              :symbol-name (x :asset)
-              })
-                          assets)]
-        ;; Step 3: Run the installation commands
-        ;;
-        ;; Baked into the assumptions for these commands is the following:
-        ;;
-        ;;
-        ;; 1) All assets will be located in a directory .spm/<package-name>-<asset-name>/
-        ;; 2) The current working directory of every command will be .spm/<package-name>/
-        ;; 3) After installation, all files downloaded will be deleted.
-        ;; 4)
-        
-        
-        
+      (let [assetenv (doall (map (fn [x]
+                                   {
+                                    :local-file (package/effective-asset-path package-description x)
+                                    :effective-path  (.substring (download/download-to (x :name) (x :url) (package/make-asset-path package-description x)) 5) ;; we trim off the .spm\ bit (hence the substring)
+                                    :symbol-name (x :asset)
+                                    :name        (x :name)
+                                    :real-path   (package/make-asset-path package-description x)
+                                    })
+                           assets))]
+        (do
+          ;; Step 3: Run the installation commands
+          ;;
+          ;; Baked into the assumptions for these commands is the following:
+          ;;
+          ;;
+          ;; 1) All assets will be located in a directory .spm/<package-name>-<version>/ as <package-name>-<asset-name> in that directory
+          ;; 2) The current working directory of every command will be .spm/<package-name>-<version>/
+          ;; 3) After installation, all files downloaded will be deleted.
+          (log/info "[command-install] Running package-specific installation commands")
+          (run-install-script package-description assetenv)
+
+          ;; Step 4: Cleanup any downloaded files.
+          (log/info "[command-install] Performing cleanup tasks...")
+          (cleanup-files assetenv)
+          )
+        (log/info "[command-install] Completed installation of package" (package/package-name-version package-description))
       ))
 
 
     )
   
   )
+
+;;(install-package (package/accuire-remote-package "openjml" '() ))
 
 (defn what-are-we-working-with? []
   (if (.exists (io/as-file (str (constants/package-filename))))
@@ -89,49 +114,27 @@
 ;; - Next we check if the current directory has package.yml file. This indicates we should do a test install of the current package, including
 ;;   any of the dependencies of that package.
 ;; - Lastly, we assume that it is a normal project, and in that case we just do an install of the tools, specs, etc that are required for this package
-;;   to function
+;;   to functionq
 ;; Note that we DO NOT CARE if people try to install multiple versions of some package. We follow the convention that we just use the most recent version of
 ;; any given package/tool/spec that is installed.
 ;;
 ;;
 (defn run [arguments options]
-  (try
-    (let [what (first arguments)]
-      (case what
-        nil
-        ;; since we didn't specify what to do, we need to determine it.
-        (case (what-are-we-working-with?)
-          :package (install-package (package/accuire-local-package))                 ;; install using the package.yml in the current working directory
-          :project (log/info "not implemented yet")                          ;; install using spekl.yml
-          (log/info "The current directory is not a package or project directory. Run ``spm init`` before running the install command")
-          )
-        ;; we specified at least some kind of argument.                         
-        (install-package (package/accuire-remote-package what (rest arguments)))     ;; download the package description and install it.
-        ))
-  (catch ScannerException e (log/info "[command-install] Invalid package description encountered for one or more packages: " (.getMessage e)))))
-
-
-;;(run '("openj") nil)
-;;(extract-assets (accuire-remote-package "openjml" '()))  ;;(run '("openjml") nil)
-
-;;(gather-missing-deps (gather-deps (accuire-remote-package "openjml" '()))
-
-;(first '("openjml"))
-
-;;(> (count (gather-missing-deps ((gather-deps (accuire-remote-package "openjml" nil)) :all-deps))) 1)
-
-
-
-                                        ;(let [package-description (accuire-remote-package "openjml" '())]
-                                        ;  (let [downloads (map (fn [x] {
-                                        ;                                :local-file (download/download-to (x :name) (x :url) (make-asset-path (package-name package-description) (x :asset)))
-                                        ;                                :symbol-name (x :asset)
-                                        ;                                } ) (extract-assets package-description))]
-                                        ;     downloads
-                                        ;   ))
-
-
-
-                                        ;(= '() null)
+  (do (try
+     (let [what (first arguments)]
+       (case what
+         nil
+         ;; since we didn't specify what to do, we need to determine it.
+         (case (what-are-we-working-with?)
+           :package (install-package (package/accuire-local-package)) ;; install using the package.yml in the current working directory
+           :project (log/info "not implemented yet") ;; install using spekl.yml
+           (log/info "The current directory is not a package or project directory. Run ``spm init`` before running the install command")
+           )
+         ;; we specified at least some kind of argument.                         
+         (install-package (package/accuire-remote-package what (rest arguments))) ;; download the package description and install it.
+         ))
+     (catch ScannerException e (log/info "[command-install] Invalid package description encountered for one or more packages: " (.getMessage e)))))
+  (System/exit 0)
+  )
 
 

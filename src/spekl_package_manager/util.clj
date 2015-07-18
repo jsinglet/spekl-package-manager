@@ -21,13 +21,9 @@
           "linux"
           "other")))))
 
-;; (defn execute-command-in-directory [env cmd dir]
-;;   (let [spm-command (command-to-spm-cmd env cmd)]
-;;     (apply shell/sh (reverse (cons dir (cons :dir (into '()  (str/split spm-command  #" ")))))))
-;;   )
-
-
-;; takes a list of maps of the form {:local-file, :symbol-name}
+;;
+;; Takes a list of maps of the form {:local-file, :symbol-name}
+;;
 (defn command-to-spm-cmd [env cmd]
   ;; replace anything we need from the environment in this command.
   (let [h (first env)]
@@ -38,8 +34,9 @@
     )
   )
 
-(command-to-spm-cmd '() "tset")
+(defn execute-command-in-directory [env cmd dir]
+  (let [spm-command (command-to-spm-cmd env cmd)]
+    (apply shell/sh (reverse (cons dir (cons :dir (into '()  (str/split spm-command  #" ")))))))
+  )
 
-
-;(first '())
 

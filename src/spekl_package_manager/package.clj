@@ -84,7 +84,7 @@
           (filter (fn [xx] (my-platform? xx)) (x :one-of)))) one-ofs))
 
 (defn installed? [package version]
-  (.exists (io/as-file (str (constants/package-directory) package "-" version))))
+  (.exists (io/file (constants/package-directory) (str package "-" version))))
 
 (defn gather-deps [package-description ]
   (let [package-depends  (package-description :depends)]
@@ -117,11 +117,23 @@
   (str (package-name package-description) " (version: " (package-description :version) ")"))
 
 (defn make-package-path [package-description]
-  (.getPath (io/file (constants/package-directory) (str (package-name package-description) (package-description :version))))
+  (.getPath (io/file (constants/package-directory) (str (package-name package-description) "-" (package-description :version))))
   )
-(defn make-asset-path [package asset]
-  (.getPath (io/file (constants/package-directory) (str package "-" asset)))
-  )
+
+(defn ext-or-nil [ext]
+  (if (= ext nil)
+    nil
+    (str "." ext)))
+
+(defn effective-asset-path [package-description asset]
+  (let [package (package-name package-description) asset-name (asset :asset) asset-ext (ext-or-nil (asset :kind))]
+    (str package "-" asset-name asset-ext)
+    ))
+
+(defn make-asset-path [package-description asset]
+  (let [package (package-name package-description) asset-name (asset :asset) asset-ext (ext-or-nil (asset :kind))]
+  (.getPath (io/file  (make-package-path package-description) (str package "-" asset-name asset-ext)))
+  ))
 
 
 (defn create-needed-dirs [package-description]

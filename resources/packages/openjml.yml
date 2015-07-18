@@ -22,8 +22,9 @@ depends:
 
 assets:
   - asset   : MAIN
+    kind    : tar.gz
     name    : openjml-source
-    url     : http://jmlspecs.sourceforge.net/openjml.zip
+    url     : https://github.com/jsinglet/OpenJML-Release-Test/releases/download/0.0.%60/openjml.tar.gz
     platform: all
         
 # assumes:
@@ -34,9 +35,9 @@ assets:
 
 # downloads everything to the .
 install:
-  - cmd: tar -zxvf $MAIN
+  - cmd: tar -zxvf MAIN
     description: Unpacking the archive...
     platform: all
-  - cmd: tar zxvf $MAIN
+  - cmd: ls -al MAIN
     description: Unpacking the archive...
     platform: windows

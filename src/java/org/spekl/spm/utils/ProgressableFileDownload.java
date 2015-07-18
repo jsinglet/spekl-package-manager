@@ -101,9 +101,10 @@ public class ProgressableFileDownload {
 
             done();
 
+	    out.close();
         } catch (IOException  e) {
             throw new DownloadException(e.getMessage());
-        }
+        } 
 
         return destination;
     }
