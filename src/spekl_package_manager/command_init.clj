@@ -7,6 +7,8 @@
             [spekl-package-manager.prompts :as prompt]
             [clojure.tools.logging :as log]
             [spekl-package-manager.constants :as const]
+            [spekl-package-manager.package   :as package]
+            [spekl-package-manager.backend   :as backend]
   ))
 
 ;;
@@ -36,15 +38,35 @@
   (log/info "[new-project]" "Done."))
 
 (defn init-tool-with-config [project-file]
-  (log/info "[new-tool]" "Writing configuration file to package.yml")
-  (spit (const/package-filename) project-file)
-  (log/info "[new-tool]" "Done."))
+    (if (.exists (io/as-file (const/project-filename)))
+      (do ;; if it's part of a project, we do our work in .spm
+        (log/info "[new-tool]" "Writing configuration file to .spm/package.yml")
+        (spit (package/make-package-file-path (package/read-conf project-file)) project-file)
+        (backend/init-at (package/make-package-file-path (package/read-conf project-file)))
+        )
+      (do ;; otherwise we do our work in the .spm directory
+        (log/info "[new-tool]" "Writing configuration file to package.yml")
+        (spit (const/package-filename) project-file)
+        (backend/init)
+        )
+      )
+    (log/info "[new-tool]" "Done."))
+  
 
 (defn init-spec-with-config [project-file]
-  (log/info "[new-spec]" "Writing configuration file to package.yml")
-  (spit (const/package-filename) project-file)
-  (log/info "[new-spec]" "Done."))
-
+    (if (.exists (io/as-file (const/project-filename)))
+      (do ;; if it's part of a project, we do our work in .spm
+        (log/info "[new-spec]" "Writing configuration file to .spm/package.yml")
+        (spit (package/make-package-file-path (package/read-conf project-file)) project-file)
+        (backend/init-at (package/make-package-file-path (package/read-conf project-file)))
+        )
+      (do ;; otherwise we do our work in the .spm directory
+        (log/info "[new-spec]" "Writing configuration file to package.yml")
+        (spit (const/package-filename) project-file)
+        (backend/init)
+        )
+      )
+    (log/info "[new-spec]" "Done."))
 
 (defn run-spec [arguments]
   (log/info "[new-spec]" "Creating new spec project...")

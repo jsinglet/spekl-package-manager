@@ -1,10 +1,13 @@
 (ns spekl-package-manager.package
-    (:require [clj-yaml.core :as yaml]
+  (:require [clj-yaml.core :as yaml]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [spekl-package-manager.util :as util]
             [spekl-package-manager.constants :as constants]
-            ))
+            )
+  (:import
+    (java.io FileNotFoundException)
+    (org.spekl.spm.utils PackageLoadException)))
 
 
 ;;
@@ -17,15 +20,26 @@
 ;;
 (defn read-local-conf
   [file-name]
-  (yaml/parse-string (slurp file-name))
+  (yaml/parse-string (slurp file-name)))
+
+(defn read-conf [conf]
+  (yaml/parse-string conf))
+;;
+;; used mostly for debugging, this function allows a LOCAL version of a package file to override a remote one
+;;
+(defn locate-shadow-package-file [file-name]
+  (try
+    (if (.exists (io/as-file file-name))
+      (io/as-file file-name)
+      (.getFile (io/resource file-name))
+      )
+    (catch NullPointerException e (throw (PackageLoadException. (str  "Cannot load local (resource-based) package file: " file-name))))
+    )
   )
 
 (defn read-remote-conf
-  ([package version] (read-local-conf (.getFile (io/resource (str "packages/" package "-" version ".yml")))))
-  ([package] (read-local-conf (.getFile (io/resource (str "packages/" package ".yml")))))
-  )
-
-
+    ([package version] (read-local-conf (locate-shadow-package-file (str "packages/" package "-" version ".yml"))))
+    ([package] (read-local-conf (locate-shadow-package-file (str "packages/" package ".yml")))))
 
 (defn accuire-remote-package [package version]
   (log/info "[command-install] Finding package" package "in remote repository")

@@ -6,7 +6,8 @@
             [spekl-package-manager.download :as download]
             [spekl-package-manager.package :as package]
             )
-  (:import (org.yaml.snakeyaml.scanner ScannerException)))
+  (:import (org.yaml.snakeyaml.scanner ScannerException)
+           (org.spekl.spm.utils PackageLoadException)))
  
 
 (defn print-missing-deps [deps]
@@ -137,8 +138,15 @@
          ;; we specified at least some kind of argument.                         
          (install-package (package/accuire-remote-package what (rest arguments))) ;; download the package description and install it.
          ))
-     (catch ScannerException e (log/info "[command-install] Invalid package description encountered for one or more packages: " (.getMessage e)))))
+     (catch ScannerException e (log/info "[command-install] Invalid package description encountered for one or more packages: " (.getMessage e)))
+     (catch PackageLoadException e (log/info "[command-install] Unable to load package. " (.getMessage e)))
+
+     ))
   (System/exit 0)
   )
 
 
+;;
+;; TODO:
+;; - test version of "install" command that installs the package in the current local directory.
+;;
