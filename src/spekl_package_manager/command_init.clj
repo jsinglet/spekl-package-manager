@@ -20,10 +20,17 @@
                                   (prompt/create "Project Version?" "0.0.1")]
 
               :configure-tool    [(prompt/create "Tool Name?" "my tool")
-                                  (prompt/create "Version?"   "0.0.1")]
+                                  (prompt/create "Version?"   "0.0.1")
+                                  (prompt/create "Author Name?"   "Some User")
+                                  (prompt/create "Author Email?"   "user@email.com")
+
+                                  ]
 
               :configure-spec    [(prompt/create "Spec Name?" "my spec")
-                                  (prompt/create "Version?"   "0.0.1")]
+                                  (prompt/create "Version?"   "0.0.1")
+                                  (prompt/create "Author Name?"   "Some User")
+                                  (prompt/create "Author Email?"   "user@email.com")
+                                  ]
 
               })
 
@@ -40,9 +47,10 @@
 (defn init-tool-with-config [project-file]
     (if (.exists (io/as-file (const/project-filename)))
       (do ;; if it's part of a project, we do our work in .spm
-        (log/info "[new-tool]" "Writing configuration file to .spm/package.yml")
+        (log/info "[new-tool]" "Writing configuration file to: " (package/make-package-file-path (package/read-conf project-file)))
+        (package/create-needed-dirs (package/read-conf project-file))
         (spit (package/make-package-file-path (package/read-conf project-file)) project-file)
-        (backend/init-at (package/make-package-file-path (package/read-conf project-file)))
+        (backend/init-at (package/make-package-path (package/read-conf project-file)))
         )
       (do ;; otherwise we do our work in the .spm directory
         (log/info "[new-tool]" "Writing configuration file to package.yml")
@@ -56,9 +64,10 @@
 (defn init-spec-with-config [project-file]
     (if (.exists (io/as-file (const/project-filename)))
       (do ;; if it's part of a project, we do our work in .spm
-        (log/info "[new-spec]" "Writing configuration file to .spm/package.yml")
+        (log/info "[new-spec]" "Writing configuration file to:" (package/make-package-file-path (package/read-conf project-file)))
+        (package/create-needed-dirs (package/read-conf project-file))
         (spit (package/make-package-file-path (package/read-conf project-file)) project-file)
-        (backend/init-at (package/make-package-file-path (package/read-conf project-file)))
+        (backend/init-at (package/make-package-path (package/read-conf project-file)))
         )
       (do ;; otherwise we do our work in the .spm directory
         (log/info "[new-spec]" "Writing configuration file to package.yml")
@@ -71,13 +80,15 @@
 (defn run-spec [arguments]
   (log/info "[new-spec]" "Creating new spec project...")
 
-  (let [[project-name project-version] (prompt/fill prompts :configure-spec)]
+  (let [[project-name project-version author-name author-email] (prompt/fill prompts :configure-spec)]
     (let
       [project-file (templates/template-with-params
                       "minimal-spec"
                       {
                        "project_name" project-name
                        "project_version" project-version
+                       "author_name" author-name
+                       "author_email" author-email
                        })
        ]
       (prompt/looks-reasonable
@@ -89,13 +100,16 @@
 (defn run-tool [arguments]
   (log/info "[new-tool]" "Creating new tool project...")
 
-  (let [[project-name project-version] (prompt/fill prompts :configure-tool)]
+  (let [[project-name project-version author-name author-email] (prompt/fill prompts :configure-tool)]
     (let
       [project-file (templates/template-with-params
                       "minimal-tool"
                       {
                        "project_name" project-name
                        "project_version" project-version
+                       "author_name" author-name
+                       "author_email" author-email
+
                        })
        ]
       (prompt/looks-reasonable

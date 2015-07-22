@@ -6,3 +6,5 @@
 (defn package-filename [] (str (rt/working-dir) "package.yml"))
 (defn package-directory [] (str (rt/working-dir) ".spm"))
 
+
+(defn git-base [] "https://github.com/Spekl/")

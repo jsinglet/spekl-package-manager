@@ -2,6 +2,12 @@ name   : ${project_name}          # name of the package
 version: ${project_version}       # version of the package
 kind   : tool                     # one of tool or spec(s)
 
+author:
+  - name: ${author_name}
+    email: ${author_email}
+
+
+
 # a list of the named and versioned packages that must be installed before
 # installing 
 # depends:                               

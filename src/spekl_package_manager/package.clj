@@ -73,6 +73,11 @@
 (defn is-dep? [o] (and (not (is-one-of? o)) (my-platform? o)))
 
 
+(defn is-package-directory?
+  ([] (.exists (io/as-file (constants/package-filename))))
+  ([path] (.exists (io/file path (constants/package-filename))))
+  )
+
 (defn pick-one-of [what]
   (do
     (println "This package allows you to select from the following optional dependences. Please select one of the following:")
@@ -170,4 +175,10 @@
   (let [destination (make-package-file-path package-description)]
     (spit destination (yaml/generate-string package-description))
     )
+  )
+
+
+(defn package-description-from-path
+  ([] (read-local-conf (.getPath (io/file (constants/package-filename)))))
+  ([path] (read-local-conf (.getPath (io/file path (constants/package-filename)))))
   )
