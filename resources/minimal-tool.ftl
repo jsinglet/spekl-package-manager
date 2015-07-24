@@ -1,6 +1,7 @@
-name   : ${project_name}          # name of the package
-version: ${project_version}       # version of the package
-kind   : tool                     # one of tool or spec(s)
+name       : ${project_name}          # name of the package
+version    : ${project_version}       # version of the package
+kind       : tool                     # one of tool or spec(s)
+description: ${project_description}
 
 author:
   - name: ${author_name}
