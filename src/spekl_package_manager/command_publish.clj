@@ -69,7 +69,7 @@
         (if (util/in? (backend/get-versions current-package) version)
           (throw (Exception. (str "The version (" version ") listed in your package.yml file has already been published. Please increment this value and try again.")))
           )
-
+        
 
         )
       

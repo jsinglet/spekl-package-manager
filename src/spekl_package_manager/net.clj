@@ -4,7 +4,7 @@
 
             ))
 
-(defn fetch-url[address]
+(defn fetch-url [address]
   (with-open [stream (.openStream (java.net.URL. address))]
     (let  [buf (java.io.BufferedReader. 
                 (java.io.InputStreamReader. stream))]

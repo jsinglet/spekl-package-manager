@@ -4,6 +4,7 @@
             [clojure.tools.logging :as log]
             [spekl-package-manager.constants :as constants]
             [spekl-package-manager.package :as package]
+            [clj-http.client :as client]
             )
   (:import [java.io FileNotFoundException File]
            [org.eclipse.jgit.lib RepositoryBuilder AnyObjectId]
@@ -28,12 +29,18 @@
 ;; where all the repos live
 ;; 
 (def repo-homes "../spm-root/")
+(def api-home  "http://localhost:8000/")
 
 ;;    
+(declare is-initial-version?)
+(declare calculate-remote)
 
 (defn extract-commit-message [path]
-  (let [package-description (package/package-description-from-path path)]
-    (str "Updates to " (package-description :name) " version " (package-description :version))))
+  (if (is-initial-version? path)
+    "Creation of package"
+    (let [package-description (package/package-description-from-path path)]
+      (str "Updates to " (package-description :name) " version " (package-description :version))))
+  )
 
 
 
@@ -65,14 +72,6 @@
   (let [author (pick-author ((package/package-description-from-path path) :author))]
     author))
 
-(defn init []
-  (log/info "[backend-init] Creating SPM repository connection...")
-  (git/git-init))
-
-(defn init-at [here]
-  (log/info "[backend-init-at] Creating SPM repository connection...")
-  (git/git-init here))
-
 
 (defn save-version [path]
   (do
@@ -81,26 +80,77 @@
 
   )
 
-(defn is-initial-version? [path]
-  (= nil (git/git-branch-list (git/load-repo path))))
+(defn init []
+  (do
+    (log/info "[backend-init] Creating SPM repository connection...")
+    (git/git-init)
+    (save-version ".")
+    ))
 
+(defn init-at [here]
+  (do
+    (log/info "[backend-init-at] Creating SPM repository connection...")
+    (git/git-init here)
+    (save-version here)))
+
+
+
+(defn git-tag-list
+  ([^Git repo]
+   (-> repo
+       (.tagList)
+       (.call)))
+   ([^Git repo ^String remote]
+    (-> repo
+        (.lsRemote)
+        (.setRemote remote)
+        (.setTags true)
+        (.setHeads false)
+        (.call)
+        )
+     )
+  )
 
 (defn get-versions-full [path]
-  (map (fn [ref] (.getName ref)) (git/git-branch-list (git/load-repo path)))
+ (concat 
+   (map (fn [ref] (.getName ref)) (git-tag-list (git/load-repo path)))   ;; locals
+   (map (fn [ref] (.getName ref)) (git-tag-list (git/load-repo path) (calculate-remote path))) ;; remotes
+  )
   )
 
 (defn get-versions [path]
-  (let [versions (get-versions-full path)]
-    (map (fn [ref] 
-    (let [parts (.split ref "/")]
-      (nth parts (- (count parts) 1))
-      )) versions)
-    ))
+  (distinct (let [versions (get-versions-full path)]
+     (map (fn [ref] 
+            (let [parts (.split ref "/")]
+              (nth parts (- (count parts) 1)))
+            ) versions)
+     )))
+
+
+
+(defn git-tag [^Git repo ^String tag]
+  (-> repo
+      (.tag)
+      (.setName tag)
+      (.call)))
+
+(defn git-delete-tag [^Git repo ^String tag]
+  (-> repo
+      (.tagDelete)
+      (.setTags (into-array String [tag]) )
+      (.call)
+      )
+  )
+
+(defn is-initial-version? [path]
+  (= 0 (count (git-tag-list (git/load-repo path)))))
 
 (defn new-version [path version]
-  (do 
-    (git/git-branch-create (git/load-repo path) version)
-    (git/git-checkout (git/load-repo path) version)
+  (do
+    (save-version path)                     ;; do the local commit
+    (git-tag (git/load-repo path) version)
+    ;; (git/git-branch-create (git/load-repo path) version)
+    ;; (git/git-checkout (git/load-repo path) version)
     ))
 
 (defn calculate-remote [path]
@@ -114,9 +164,11 @@
 (defn git-push
   ([^Git repo] (-> repo
                    (.push)
+                   (.setPushTags)
                    (.call)))
   ([^Git repo ^String remote] (-> repo
                                   (.push)
+                                  (.setPushTags)
                                   (.setRemote remote)
                                   (.setCredentialsProvider git/*credentials*)
                                   (.call))))
@@ -132,26 +184,26 @@
 
 
 
-
-
 (defn get-password [username]
   (let [msg (str "Password for <" username ">:") ]
-  (do
-    (print msg)
-    (flush)
-    (let [pwd (read-line)]
-      pwd)
-    )))
-    ;; (try 
-    ;;   (String/valueOf (.readPassword (System/console) msg nil))
-    ;;   (catch NullPointerException e (
-    ;;                                  (do
-    ;;                                    (print msg)
-    ;;                                    (flush)
-    ;;                                    (let [pwd (read-line)]
-    ;;                                      pwd)
-    ;;                                    )
-    ;;                                  )))))
+
+
+    ;; (do
+  ;;   (print msg)
+  ;;   (flush)
+  ;;   (let [pwd (read-line)]
+  ;;     pwd)
+  ;;   )))
+    (try 
+      (String/valueOf (.readPassword (System/console) msg nil))
+      (catch NullPointerException e (
+                                     (do
+                                       (print msg)
+                                       (flush)
+                                       (let [pwd (read-line)]
+                                         pwd)
+                                       )
+                                     )))))
 
 
 (defn push-version [path]
@@ -163,12 +215,25 @@
         (git-push (git/load-repo path) (calculate-remote path)))
       )))
 
+
+
+(defn undo-version [path]
+  (let [version ((package/package-description-from-path path) :version)]
+    (git-delete-tag (git/load-repo path) version)
+    ))
+
 (defn sync-version [path]
   ;; cleanup commits
   (do
-    (save-version path) ;; do the local commit
-    (push-version path) ;; push it up
+    ;; if we are at this point, we have created a tag that matches the current version. if this fails, we need to delete that tag.
+    (try
+      (push-version path)
+      (catch Exception e   (log/info "[command-publish] Publish failed with message: " (.getMessage e) ". Rolling back this version.") (undo-version path))
+      ) ;; push it up
     )
   )
+
+(defn register-project [name username]
+  (client/get (str api-home "Package/create" ) {:query-params {"project" name "username" username}}))
 
 
