@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: clj-jgit:0.8.8">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/clj-jgit/clj-jgit/0.8.8/clj-jgit-0.8.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

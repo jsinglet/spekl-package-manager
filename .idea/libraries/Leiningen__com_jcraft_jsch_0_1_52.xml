@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: com.jcraft/jsch:0.1.52">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/jcraft/jsch/0.1.52/jsch-0.1.52.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
