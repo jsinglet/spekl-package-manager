@@ -164,10 +164,12 @@
 (defn git-push
   ([^Git repo] (-> repo
                    (.push)
+                   (.setPushAll)
                    (.setPushTags)
                    (.call)))
   ([^Git repo ^String remote] (-> repo
                                   (.push)
+                                  (.setPushAll)
                                   (.setPushTags)
                                   (.setRemote remote)
                                   (.setCredentialsProvider git/*credentials*)
