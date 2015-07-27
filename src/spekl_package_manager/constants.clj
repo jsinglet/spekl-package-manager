@@ -12,5 +12,13 @@
 
 (def api-raw "https://raw.githubusercontent.com/")
 (def api-all-repos (str "https://api.github.com/orgs/" org-name "/repos"))
-(def api-key "ee72820ba97e94c64819ae30b467c680af225273")
-(def api-name "jsinglet")
+(def api-all-teams (str "https://api.github.com/orgs/" org-name "/teams"))
+
+(defn api-delete-repo [repo] (str "https://api.github.com/repos/" org-name "/" repo))
+(defn api-delete-team [team] (str "https://api.github.com/teams/" team))
+
+
+
+(def api-key "04faf84ae7b17fbc0e5cd9f17b78afe338f717a3")
+(def api-name "spekl-admin")
+
