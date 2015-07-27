@@ -8,6 +8,8 @@
 
 (def org-name "Spekl")
 
+(def spm-home "http://http://10.173.204.196/")
+(defn spm-package-list [] (str spm-home "static-package-list.json"))
 (defn git-base [] "https://github.com/Spekl/")
 
 (def api-raw "https://raw.githubusercontent.com/")
