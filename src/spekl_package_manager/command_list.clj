@@ -4,11 +4,11 @@
 
 (defn run-specs [packages]
   (doseq [x packages] (println
-                       (format "(%s) %-10s - %s" (x "kind") (x "name")  (x "description")))))
+                       (format "(%s) %-20s - %s (version: %s)" (x "kind") (x "name")  (x "description")  (x "version")))))
  
 (defn run-tools [packages]
   (doseq [x packages] (println
-                       (format "(%s)  %-10s - %s" (x "kind") (x "name")  (x "description")))))
+                       (format "(%s)  %-20s - %s (version: %s)" (x "kind") (x "name")  (x "description")  (x "version")))))
 
 
 (defn run-list []
