@@ -24,22 +24,27 @@
 
 (defn read-conf [conf]
   (yaml/parse-string conf))
+
+
+(defn create-package-url [name version]
+  (str constants/api-raw constants/org-name "/" name "/" version "/" (constants/package-filename)  ))
+
 ;;
 ;; used mostly for debugging, this function allows a LOCAL version of a package file to override a remote one
 ;;
-(defn locate-shadow-package-file [file-name]
+(defn locate-shadow-package-file [package version file-name]
   (try
     (if (.exists (io/as-file file-name))
       (io/as-file file-name)
-      (.getFile (io/resource file-name))
+      (create-package-url package version)
       )
     (catch NullPointerException e (throw (PackageLoadException. (str  "Cannot load local (resource-based) package file: " file-name))))
     )
   )
 
 (defn read-remote-conf
-    ([package version] (read-local-conf (locate-shadow-package-file (str "packages/" package "-" version ".yml"))))
-    ([package] (read-local-conf (locate-shadow-package-file (str "packages/" package ".yml")))))
+    ([package version] (read-local-conf (locate-shadow-package-file package version (str "packages/" package "-" version ".yml"))))
+    ([package] (read-local-conf (locate-shadow-package-file package "master" (str "packages/" package ".yml")))))
 
 (defn accuire-remote-package [package version]
   (log/info "[command-install] Finding package" package "in remote repository")
