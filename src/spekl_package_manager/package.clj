@@ -51,7 +51,7 @@
   ;; TODO replace with remote file reading.
   (case version
     '()   (read-remote-conf package)
-    (read-remote-conf package version)
+    (read-remote-conf package (first version))
     ))
 
 ;; install the current directory's package or proces the spekl.yml  file
