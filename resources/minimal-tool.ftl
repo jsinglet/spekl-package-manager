@@ -31,6 +31,7 @@ author:
 
 # assets:
 #     - asset   : MAIN
+#       name    : my-asset
 #       url     : http://www.openjml.org/downloads/1.1.2.tar.gz  
 #       platform: all
         
@@ -42,7 +43,9 @@ author:
 
 # downloads everything to the .
 # install:
-#   - cmd: tar zxvf $MAIN
+#   - cmd: tar zxvf MAIN
+#     description: What this command does
 #     platform: all
 #   - cmd: tar zxvf $MAIN
+#     description: What this command does...
 #     platform: windows
