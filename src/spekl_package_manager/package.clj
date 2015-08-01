@@ -11,11 +11,6 @@
 
 
 ;;
-;; Contains the multitude of support functions needed for working with package files
-;;
-
-
-;;
 ;; Functions for reading configurations
 ;;
 (defn read-local-conf
@@ -51,7 +46,11 @@
   ;; TODO replace with remote file reading.
   (case version
     '()   (read-remote-conf package)
-    (read-remote-conf package (first version))
+    (if (instance? String version)
+      (read-remote-conf package version)
+      (read-remote-conf package (first version))
+      )
+
     ))
 
 ;; install the current directory's package or proces the spekl.yml  file

@@ -24,3 +24,4 @@
 (def api-key "04faf84ae7b17fbc0e5cd9f17b78afe338f717a3")
 (def api-name "spekl-admin")
 
+(defn check-file [] "check.clj")

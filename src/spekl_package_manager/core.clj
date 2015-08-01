@@ -25,6 +25,7 @@
             [spekl-package-manager.command-install :as command-install]
             [spekl-package-manager.command-publish :as command-publish]
             [spekl-package-manager.command-cache :as command-cache]
+            [spekl-package-manager.command-check :as command-check]
 
             [clojure.java.io :as io]
             [spekl-package-manager.runtime :as rt]
@@ -130,6 +131,7 @@
           "install" (command-install/run (rest arguments) options)
           "publish" (command-publish/run (rest arguments) options)
           "cache"   (command-cache/run (rest arguments) options)
+          "check"   (command-check/run (rest arguments) options)          
           "help"    (exit 0 (usage summary))
           (exit 1 (usage summary)))
         (catch IllegalArgumentException e (exit 1 (usage summary))))
