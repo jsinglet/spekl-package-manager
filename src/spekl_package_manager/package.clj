@@ -7,7 +7,10 @@
             )
   (:import
     (java.io FileNotFoundException)
-    (org.spekl.spm.utils PackageLoadException)))
+    (org.spekl.spm.utils PackageLoadException
+                         ProjectConfigurationException
+                         CantFindPackageException
+                         )))
 
 
 ;;
@@ -41,17 +44,32 @@
     ([package version] (read-local-conf (locate-shadow-package-file package version (str "packages/" package "-" version ".yml"))))
     ([package] (read-local-conf (locate-shadow-package-file package "master" (str "packages/" package ".yml")))))
 
+(defn version-to-version-string [version]
+ (case version
+     '()   "LATEST"
+     nil   "LATEST"
+
+     (if (instance? String version)
+       version
+       (first version)
+       )))
+
 (defn accuire-remote-package [package version]
   (log/info "[command-install] Finding package" package "in remote repository")
   ;; TODO replace with remote file reading.
-  (case version
-    '()   (read-remote-conf package)
-    (if (instance? String version)
-      (read-remote-conf package version)
-      (read-remote-conf package (first version))
-      )
+  (try 
+   (case version
+     '()   (read-remote-conf package)
+     nil   (read-remote-conf package)
 
-    ))
+     (if (instance? String version)
+       (read-remote-conf package version)
+       (read-remote-conf package (first version))
+       )
+
+     )
+   (catch FileNotFoundException e (throw (CantFindPackageException. (str "Unable to find package: " package " version: " (version-to-version-string version)))   ))
+   ))
 
 ;; install the current directory's package or proces the spekl.yml  file
 (defn accuire-local-package []

@@ -12,6 +12,7 @@ FIXME: explanation
 
     $ java -jar spekl-package-manager-0.1.0-standalone.jar [args]
 
+
 ## Options
 
 FIXME: listing of options this app accepts.
@@ -34,3 +35,15 @@ Copyright © 2015 FIXME
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+
+
+
+## Some Commands to Make Life Easy
+
+# Build the Classpath
+
+     $ ls -m target\deps  | tr ',' ';' | tr '\\n' ' ' | tr -d ' ' > target/deps-classpath.txt
+
+# Get Ready For Packing
+
+     $ lein with-profile dist jar

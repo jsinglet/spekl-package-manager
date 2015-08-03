@@ -10,6 +10,11 @@
             [clojure.string :as string]
             [clojure.java.shell :as shell]
             )
+
+    (:import
+    (java.io FileNotFoundException)
+    (org.spekl.spm.utils PackageLoadException
+                         ProjectConfigurationException))
   )
 
 
@@ -43,7 +48,15 @@
 ;;
 (defn get-required-specifications [specs]
   (let [all-packages (get-all-package-descriptions)]
-    (filter (fn [x] (package-is-required-spec (x :description) specs)) all-packages)))
+    (let [found-specs  (filter (fn [x] (package-is-required-spec (x :description) specs)) all-packages)]
+
+      ;; make sure we found everything we tried to find
+      (if (= (count found-specs) (count specs))
+        found-specs
+        (throw (PackageLoadException. (str "Some specification packages were not found.")))
+        )
+
+      )))
 
 ;; to do this the following is done
 ;; we create a hash grouping :package_name => [installed packages]
@@ -113,14 +126,34 @@
   )
 
 (defn locate-configured-check
-  ([name] (first (filter (fn [x] (.equals name (x :name))) (load-configured-checks))))
-  ([name version] (first (filter (fn [x] (and ((x :tool) :version) (.equals name (x :name)))) (load-configured-checks))))
-
+  ([name] (let [check  (first (filter (fn [x] (.equals name (x :name))) (load-configured-checks)))]
+            (if (= nil check)
+              (throw (ProjectConfigurationException. (str "Check named \"" name "\" is not configured in spekl.yml")))
+              check
+              )
+            ))
+  ([name version] (let [check  (first (filter (fn [x] (and ((x :tool) :version) (.equals name (x :name)))) (load-configured-checks)))]
+                    (if (= nil check)
+                      (throw (ProjectConfigurationException. (str "Check named \"" name "\" is not configured in spekl.yml")))
+                      check
+                      )
+                    ))
   )
 
 (defn locate-package-check
-  ([name] (first (filter (fn [package] (.equals name (package/package-name (package :description)))) (only-current-packages))))
-  ([name version] (first (filter (fn [package] (and  (.equals version ((package :description) :version)) (.equals name (package/package-name (package :description))))) (get-all-package-descriptions))))
+  ([name] (let [check  (first (filter (fn [package] (.equals name (package/package-name (package :description)))) (only-current-packages)))]
+            (if (= nil check)
+              (throw (PackageLoadException. (str "Packed named \"" name "\" is not installed.")))
+              check
+              )
+            ))
+ 
+  ([name version] (let [check  (first (filter (fn [package] (and  (.equals version ((package :description) :version)) (.equals name (package/package-name (package :description))))) (get-all-package-descriptions)))]
+                    (if (= nil check)
+                      (throw (PackageLoadException. (str "Package named \"" name "\" (version: " version  ") is not installed.")))
+                      check
+                      )
+                    ))
   )
 
 (defn create-run-configuration [configured-check package-data]
@@ -167,12 +200,15 @@
          ;; run a specific check
          (run-check what (rest arguments))
          ))
+     (catch PackageLoadException e (log/info "[command-check] One or more packages are missing. Please run `spm install` to install them." (.getMessage e)))
+     (catch ProjectConfigurationException e (log/info "[command-check] There is an error in your project configuration:" (.getMessage e)))
      (catch Exception e (log/info "[command-check] Encountered a problem while checking: " (.printStackTrace e)))
      ))
 ;;  (System/exit 0)
   )
 
 ;;(run '() nil)
+
 
 
 

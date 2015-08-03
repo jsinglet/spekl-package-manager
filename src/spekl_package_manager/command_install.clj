@@ -7,7 +7,8 @@
             [spekl-package-manager.package :as package]
             )
   (:import (org.yaml.snakeyaml.scanner ScannerException)
-           (org.spekl.spm.utils PackageLoadException)))
+           (org.spekl.spm.utils PackageLoadException
+                                CantFindPackageException)))
  
 
 (defn print-missing-deps [deps]
@@ -107,9 +108,51 @@
       :project
     )))
 
-;; installs all the things needed for the local project. 
+
+
+(defn tools-for-project [project]
+  (map (fn [x]
+         (list ((x :tool) :name) ((x :tool) :version))
+         ) (project :checks))
+
+  )
+
+(defn specs-for-project [project]
+  ;; extract all specs nodes
+  (let [specs (flatten (map (fn [x] (x :specs) )   (project :checks)))]
+    (map (fn [x] (list (x :name) (x :version))) specs)
+    )
+  )
+
+;(tools-for-project (package/read-local-conf (constants/project-filename)))
+;(specs-for-project (package/read-local-conf (constants/project-filename)))
+
+;; installs all the things needed for the local project by finding the packages and versions needed to satisfy
+;; a project and installing them in sequence.
+;; some logic should go here to perhaps reorder the tree in the case circular dependencies are encountered. 
 (defn install-project []
-  (log/info "Feature not implemented yet."))
+  ;; load project configuration 
+  (let [spekl-file  (package/read-local-conf (constants/project-filename))]
+    (log/info "[command-install] Installing packages for this project...")
+
+    (do
+      ;; tools
+      (log/info "[command-install] Installing tools....")
+      
+      (doall
+       (map (fn [dep]
+              (install-package (package/accuire-remote-package (first dep) (rest dep))))
+            (tools-for-project spekl-file)))
+      
+      ;; specs
+      (log/info "[command-install] Installing specs....")
+      (doall
+       (map (fn [dep]
+              (install-package (package/accuire-remote-package (first dep) (rest dep))))
+            (specs-for-project spekl-file)))
+      )
+      (log/info "[command-install] Done. Use `spm check` to check your project.")
+  ))
 
 ;;
 ;; 
@@ -132,12 +175,13 @@
          ;; since we didn't specify what to do, we need to determine it.
          (case (what-are-we-working-with?)
            :package (install-package (package/accuire-local-package)) ;; install using the package.yml in the current working directory
-           :project (log/info "not implemented yet") ;; install using spekl.yml
+           :project (install-project);; install using spekl.yml
            (log/info "The current directory is not a package or project directory. Run ``spm init`` before running the install command")
            )
          ;; we specified at least some kind of argument.                         
          (install-package (package/accuire-remote-package what (rest arguments))) ;; download the package description and install it.
          ))
+     (catch CantFindPackageException e (log/info "[command-install] Cannot find a package matching that description: " (.getMessage e)))
      (catch ScannerException e (log/info "[command-install] Invalid package description encountered for one or more packages: " (.getMessage e)))
      (catch PackageLoadException e (log/info "[command-install] Unable to load package. " (.getMessage e)))
 

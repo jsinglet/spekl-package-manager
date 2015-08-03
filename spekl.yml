@@ -1,0 +1,30 @@
+#
+# Basic Project Information
+#
+name            : My Awesome Project
+project-id      : my.test.project
+version         : 0.1
+
+  
+#
+# Tools
+#
+
+checks : 
+  - name        : openjml-esc
+    description : "OpenJML All File ESC"
+    language    : java              # might not need this, because it is implied by the tool
+    paths       : [resources/*.java] 
+
+    tool: 
+      name      : openjml-esc
+      version   : 0.0.1
+      pre_check :  # stuff to do before a check
+      post_check:  # stuff to do before a check
+
+    specs:
+      - name: java-core
+        version: 1.1.1
+
+
+        

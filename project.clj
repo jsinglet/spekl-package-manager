@@ -2,6 +2,7 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :resource-paths ["resources/" "resources/packages/"]
+  :libdir-path "target/deps"
   :java-source-paths ["src/java"]
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -25,6 +26,13 @@
   :main ^:skip-aot spekl-package-manager.core
   :target-path "target/%s"
   :profiles {:uberjar {
+                       :main spekl-package-manager.core
                        :aot :all
                        :resource-paths ["resources/"]
-                       }})
+                       }
+             :dist {
+                   :main spekl-package-manager.core
+                   :aot :all
+                   :resource-paths ["resources/"]
+                   }
+             })
