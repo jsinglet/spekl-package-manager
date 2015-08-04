@@ -38,7 +38,9 @@
     )
   )
 
-(defn install-package [package-description]
+(declare install-package)
+
+(defn do-install-package [package-description]
   (log/info "[command-install] Starting install of package" (package/package-name-version package-description))
 
   (do
@@ -99,7 +101,10 @@
   
   )
 
-;;(install-package (package/accuire-remote-package "openjml" '() ))
+(defn install-package [package-description]
+  (if (package/installed? (package/package-name package-description) (package/package-version package-description))
+    (log/info "[command-install] Package " (package/package-name-version package-description) " is already installed. Skipping...")
+    (do-install-package package-description)))
 
 (defn what-are-we-working-with? []
   (if (.exists (io/as-file (str (constants/package-filename))))
@@ -124,8 +129,10 @@
     )
   )
 
-;(tools-for-project (package/read-local-conf (constants/project-filename)))
-;(specs-for-project (package/read-local-conf (constants/project-filename)))
+
+
+
+
 
 ;; installs all the things needed for the local project by finding the packages and versions needed to satisfy
 ;; a project and installing them in sequence.
@@ -141,14 +148,14 @@
       
       (doall
        (map (fn [dep]
-              (install-package (package/accuire-remote-package (first dep) (rest dep))))
+              (install-package (package/accuire-remote-package (first dep) (first (rest dep)))))
             (tools-for-project spekl-file)))
       
       ;; specs
       (log/info "[command-install] Installing specs....")
       (doall
        (map (fn [dep]
-              (install-package (package/accuire-remote-package (first dep) (rest dep))))
+              (install-package (package/accuire-remote-package (first dep) (first (rest dep)))))
             (specs-for-project spekl-file)))
       )
       (log/info "[command-install] Done. Use `spm check` to check your project.")
@@ -190,7 +197,3 @@
   )
 
 
-;;
-;; TODO:
-;; - test version of "install" command that installs the package in the current local directory.
-;;

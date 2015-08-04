@@ -177,10 +177,11 @@
 (defn run-all-checks []
   (let [checks (load-configured-checks)]
     (log/info "[command-check] Running all checks for project...")
-    (map (fn [check]
-           (locate-and-run-check ((check :tool) :name) ((check :tool) :version))
-           ) checks)
+    (doall (map (fn [check]
+            (locate-and-run-check ((check :tool) :name) ((check :tool) :version))
+            ) checks))
     ))
+
 
 (defn run-check [name rest]
   (let [version (first rest)]

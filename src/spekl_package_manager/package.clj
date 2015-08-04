@@ -46,8 +46,8 @@
 
 (defn version-to-version-string [version]
  (case version
-     '()   "LATEST"
-     nil   "LATEST"
+   '()   "LATEST"
+   nil   "LATEST"
 
      (if (instance? String version)
        version
@@ -154,6 +154,10 @@
   (if (= nil (package-description :name))
     (package-description :package)
     (package-description :name)))
+
+(defn package-version [package-description]
+  (package-description :version))
+
 
 (defn package-name-version [package-description]
   (str (package-name package-description) " (version: " (package-description :version) ")"))
