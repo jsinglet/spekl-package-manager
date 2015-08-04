@@ -5,10 +5,12 @@
             [spekl-package-manager.constants :as constants]
             [spekl-package-manager.download :as download]
             [spekl-package-manager.package :as package]
+            [spekl-package-manager.check :as check]
             [clojure.core.reducers :as r]
             [org.satta.glob :as glob]
             [clojure.string :as string]
             [clojure.java.shell :as shell]
+            
             )
 
     (:import
@@ -87,7 +89,6 @@
     (let [indexed-packages (index-packages packages)]
       (filter (fn [package] (is-most-current-package (package :description) indexed-packages)) packages))))
 
-(declare check)
 
 ;; expands a string like [src/*.java]
 (defn expand-glob [globs]
@@ -96,12 +97,21 @@
     (map (fn [x] (.getPath x)) (r/reduce (fn [acc x] (concat acc x)) []  groups))
     ))
 
+
+(defn path-resolve [env]
+  (let [package-base (env :path-to-package)]
+    (fn
+      ;; write this
+      ([package asset])
+      ([asset] (.toString (.resolve (.toPath (io/file package-base)) asset)))  
+      ))
+  )
+
 (defn run-configured-check [configuration]
   (let [package (configuration :package-data) config (configuration :configured-check)]
    (do
      (log/info "[command-check] Running check:" (config :description))
      (load-file (.getPath (io/file (package :dir) (constants/check-file))))
-
      ;;
      ;; create the arguments for this check
      ;;
@@ -110,15 +120,28 @@
      ;; :path-to-package : the full path to the package we are going to execute the command from
      ;; :project-files   : the expanded list of files specified by the check
      ;; :specs           : extract the specs 
-     ;;
-     (check {
-             :specs (get-required-specifications (config :specs))
-             :path-to-package (package :dir)
-             :project-files (expand-glob (config :paths))
-             :project-files-string (string/join " " (expand-glob (config :paths)))
+     ;; 
+     
+     ;; (path-resolve "openjml" "openjml.jar")
+     ;; (path-resolve "openjml.jar")
+
+     (check/check
+      ;; create the path resolver closure with the environment for this package
+      (path-resolve
+       {
+        :path-to-package (package :dir)
+        })
+      ;;
+      ;; pass in the rest of the raw environment 
+      ;;
+      {
+       :specs (get-required-specifications (config :specs))
+       :project-files (expand-glob (config :paths))
+       :project-files-string (string/join " " (expand-glob (config :paths)))
        })
      ))
   )
+
 
 
 (defn load-configured-checks []
@@ -205,7 +228,7 @@
      (catch ProjectConfigurationException e (log/info "[command-check] There is an error in your project configuration:" (.getMessage e)))
      (catch Exception e (log/info "[command-check] Encountered a problem while checking: " (.printStackTrace e)))
      ))
-;;  (System/exit 0)
+    (System/exit 0)
   )
 
 ;;(run '() nil)
@@ -213,6 +236,12 @@
 
 
 
+;;(load-file ".spm/openjml-esc-WORK/check.clj")
+
+
+
+
+;;''(check/check)
 
 
 
