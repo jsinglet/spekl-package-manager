@@ -21,75 +21,6 @@
 
 
 
-(defn load-package-or-false [path]
-  (try
-    ((package/read-local-conf (.getPath (io/file path (constants/package-filename)))) :version)
-    (catch Exception e (log/info "[command-check] Skipping invalid package description in directory:" (.getPath path))))
-  )
-
-(defn get-all-package-descriptions []
-  (let [possible-package-dirs (.listFiles (io/file (constants/package-directory)))]
-    (map (fn [package-dir]
-           (let [expanded-path (io/file package-dir (constants/package-filename))]
-             {
-              :file expanded-path
-              :dir package-dir
-              :description (package/read-local-conf (.getPath expanded-path))
-              }
-             )
-           ) (filter (fn [dir] (load-package-or-false dir)) possible-package-dirs))
-    )
-  )
-
-(defn package-is-required-spec [package specs]
-  (> (count (filter (fn [x] (and (.equals (x :name) (package :name))   (.equals (x :version) (package :version))  )) specs)) 0)
-  )
-
-;;
-;; TODO - throw an error if any specs can't be found
-;;
-(defn get-required-specifications [specs]
-  (let [all-packages (get-all-package-descriptions)]
-    (let [found-specs  (filter (fn [x] (package-is-required-spec (x :description) specs)) all-packages)]
-
-      ;; make sure we found everything we tried to find
-      (if (= (count found-specs) (count specs))
-        found-specs
-        (throw (PackageLoadException. (str "Some specification packages were not found.")))
-        )
-
-      )))
-
-;; to do this the following is done
-;; we create a hash grouping :package_name => [installed packages]
-;; we sort [installed packages]
-;; we pass over each of the :package names and map it to the first element of installed packages.
-(defn index-packages [packages]
-  (let [descriptions (map (fn [package] (package :description)) packages)]
-    (let [blank-index (r/reduce (fn [acc x] (assoc acc (package/package-name x) [])) {} descriptions)]
-
-      (r/reduce (fn [acc x]
-
-                  (let [current-list (acc (package/package-name x))]
-                    (assoc acc (package/package-name x) (reverse (sort (conj current-list (x :version)))))
-                    )
-
-
-                  ) blank-index descriptions)
-      
-      
-      )
-    ))
-
-(defn is-most-current-package [package-description index]
-  (.equals (package-description :version) (first (index (package/package-name package-description)))))
-
-(defn only-current-packages []
-  (let [packages (get-all-package-descriptions)]
-    (let [indexed-packages (index-packages packages)]
-      (filter (fn [package] (is-most-current-package (package :description) indexed-packages)) packages))))
-
-
 ;; expands a string like [src/*.java]
 (defn expand-glob [globs]
   (let [groups (map (fn [x] (glob/glob (.trim x))) globs)]
@@ -99,13 +30,18 @@
 
 
 (defn path-resolve [env]
-  (let [package-base (env :path-to-package)]
+  (let [package-base (env :path-to-package) package-index (env :resolved-packages)]
     (fn
       ;; write this
-      ([package asset])
+      ([package asset] (.toString (.resolve (.toPath (io/file ((package-index package) :dir))) asset)))
       ([asset] (.toString (.resolve (.toPath (io/file package-base)) asset)))  
       ))
   )
+
+
+;; read the package file for the package that runs the tool
+;; build a map for each package it DEPENDS on
+;; :file, :dir, :description
 
 (defn run-configured-check [configuration]
   (let [package (configuration :package-data) config (configuration :configured-check)]
@@ -125,59 +61,31 @@
      ;; (path-resolve "openjml" "openjml.jar")
      ;; (path-resolve "openjml.jar")
 
-     (check/check
-      ;; create the path resolver closure with the environment for this package
-      (path-resolve
-       {
-        :path-to-package (package :dir)
-        })
-      ;;
-      ;; pass in the rest of the raw environment 
-      ;;
-      {
-       :specs (get-required-specifications (config :specs))
-       :project-files (expand-glob (config :paths))
-       :project-files-string (string/join " " (expand-glob (config :paths)))
-       })
+     (binding [check/*resolver* (path-resolve
+                           {
+                            :path-to-package (package :dir)
+                            :resolved-packages (package/index-resolved-deps (package/resolve-deps (package :description)))
+                            })
+
+               check/*project-files-string*  (string/join " " (expand-glob (config :paths)))
+               check/*project-files*  (string/join " " (expand-glob (config :paths)))
+               check/*specs* (package/get-required-specifications (config :specs))
+               ] 
+       
+       (check/default))
      ))
   )
 
+        ;;
+        ;; pass in the rest of the raw environment 
+        ;;
+        ;; {
+        ;;  :specs (package/get-required-specifications (config :specs))
+        ;;  :project-files (expand-glob (config :paths))
+        ;;  :project-files-string (string/join " " (expand-glob (config :paths)))
+        ;;  }
 
 
-(defn load-configured-checks []
-  ((package/read-local-conf (constants/project-filename)) :checks)
-  )
-
-(defn locate-configured-check
-  ([name] (let [check  (first (filter (fn [x] (.equals name (x :name))) (load-configured-checks)))]
-            (if (= nil check)
-              (throw (ProjectConfigurationException. (str "Check named \"" name "\" is not configured in spekl.yml")))
-              check
-              )
-            ))
-  ([name version] (let [check  (first (filter (fn [x] (and ((x :tool) :version) (.equals name (x :name)))) (load-configured-checks)))]
-                    (if (= nil check)
-                      (throw (ProjectConfigurationException. (str "Check named \"" name "\" is not configured in spekl.yml")))
-                      check
-                      )
-                    ))
-  )
-
-(defn locate-package-check
-  ([name] (let [check  (first (filter (fn [package] (.equals name (package/package-name (package :description)))) (only-current-packages)))]
-            (if (= nil check)
-              (throw (PackageLoadException. (str "Packed named \"" name "\" is not installed.")))
-              check
-              )
-            ))
- 
-  ([name version] (let [check  (first (filter (fn [package] (and  (.equals version ((package :description) :version)) (.equals name (package/package-name (package :description))))) (get-all-package-descriptions)))]
-                    (if (= nil check)
-                      (throw (PackageLoadException. (str "Package named \"" name "\" (version: " version  ") is not installed.")))
-                      check
-                      )
-                    ))
-  )
 
 (defn create-run-configuration [configured-check package-data]
   {
@@ -187,18 +95,18 @@
   )
 
 (defn locate-and-run-check
-  ([name] (let [version (((locate-configured-check name) :tool) :version)] (run-configured-check (create-run-configuration
+  ([name] (let [version (((package/locate-configured-check name) :tool) :version)] (run-configured-check (create-run-configuration
 
-                                                                                         (locate-configured-check name) (locate-package-check name version))
+                                                                                         (package/locate-configured-check name) (package/locate-package-check name version))
 
 
                                         )))
-  ([name version] (run-configured-check (create-run-configuration (locate-configured-check name version) (locate-package-check name version))))
+  ([name version] (run-configured-check (create-run-configuration (package/locate-configured-check name version) (package/locate-package-check name version))))
   )
 
 
 (defn run-all-checks []
-  (let [checks (load-configured-checks)]
+  (let [checks (package/load-configured-checks)]
     (log/info "[command-check] Running all checks for project...")
     (doall (map (fn [check]
             (locate-and-run-check ((check :tool) :name) ((check :tool) :version))
@@ -231,16 +139,9 @@
     (System/exit 0)
   )
 
-;;(run '() nil)
-
-
-
+;(run '() nil)
 
 ;;(load-file ".spm/openjml-esc-WORK/check.clj")
-
-
-
-
 ;;''(check/check)
 
 

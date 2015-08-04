@@ -4,6 +4,9 @@
             [clojure.tools.logging :as log]
             [spekl-package-manager.util :as util]
             [spekl-package-manager.constants :as constants]
+            [clojure.core.reducers :as r]
+            [clojure.string :as string]
+
             )
   (:import
     (java.io FileNotFoundException)
@@ -208,3 +211,170 @@
   ([] (read-local-conf (.getPath (io/file (constants/package-filename)))))
   ([path] (read-local-conf (.getPath (io/file path (constants/package-filename)))))
   )
+
+
+
+(defn load-package-or-false [path]
+  (try
+    ((read-local-conf (.getPath (io/file path (constants/package-filename)))) :version)
+    (catch Exception e (log/info "[package] Skipping invalid package description in directory:" (.getPath path))))
+  )
+
+(defn get-all-package-descriptions []
+  (let [possible-package-dirs (.listFiles (io/file (constants/package-directory)))]
+    (map (fn [package-dir]
+           (let [expanded-path (io/file package-dir (constants/package-filename))]
+             {
+              :file expanded-path
+              :dir package-dir
+              :description (read-local-conf (.getPath expanded-path))
+              }
+             )
+           ) (filter (fn [dir] (load-package-or-false dir)) possible-package-dirs))
+    )
+  )
+
+(defn package-is-required-spec [package specs]
+  (> (count (filter (fn [x] (and (.equals (x :name) (package :name))   (.equals (x :version) (package :version))  )) specs)) 0)
+  )
+
+;;
+;; TODO - throw an error if any specs can't be found
+;;
+(defn get-required-specifications [specs]
+  (let [all-packages (get-all-package-descriptions)]
+    (let [found-specs  (filter (fn [x] (package-is-required-spec (x :description) specs)) all-packages)]
+
+      ;; make sure we found everything we tried to find
+      (if (= (count found-specs) (count specs))
+        found-specs
+        (throw (PackageLoadException. (str "Some specification packages were not found.")))
+        )
+
+      )))
+
+;; to do this the following is done
+;; we create a hash grouping :package_name => [installed packages]
+;; we sort [installed packages]
+;; we pass over each of the :package names and map it to the first element of installed packages.
+(defn index-packages [packages]
+  (let [descriptions (map (fn [package] (package :description)) packages)]
+    (let [blank-index (r/reduce (fn [acc x] (assoc acc (package-name x) [])) {} descriptions)]
+
+      (r/reduce (fn [acc x]
+
+                  (let [current-list (acc (package-name x))]
+                    (assoc acc (package-name x) (reverse (sort (conj current-list (x :version)))))
+                    )
+
+
+                  ) blank-index descriptions)
+      
+      
+      )
+    ))
+
+(defn is-most-current-package [package-description index]
+  (.equals (package-description :version) (first (index (package-name package-description)))))
+
+(defn only-current-packages []
+  (let [packages (get-all-package-descriptions)]
+    (let [indexed-packages (index-packages packages)]
+      (filter (fn [package] (is-most-current-package (package :description) indexed-packages)) packages))))
+
+
+
+
+(defn load-configured-checks []
+  ((read-local-conf (constants/project-filename)) :checks)
+  )
+
+(defn locate-configured-check
+  ([name] (let [check  (first (filter (fn [x] (.equals name (x :name))) (load-configured-checks)))]
+            (if (= nil check)
+              (throw (ProjectConfigurationException. (str "Check named \"" name "\" is not configured in spekl.yml")))
+              check
+              )
+            ))
+  ([name version] (let [check  (first (filter (fn [x] (and ((x :tool) :version) (.equals name (x :name)))) (load-configured-checks)))]
+                    (if (= nil check)
+                      (throw (ProjectConfigurationException. (str "Check named \"" name "\" is not configured in spekl.yml")))
+                      check
+                      )
+                    ))
+  )
+
+(defn locate-package-check
+  ([name] (let [check  (first (filter (fn [package] (.equals name (package-name (package :description)))) (only-current-packages)))]
+            (if (= nil check)
+              (throw (PackageLoadException. (str "Packed named \"" name "\" is not installed.")))
+              check
+              )
+            ))
+ 
+  ([name version] (let [check  (first (filter (fn [package] (and  (.equals version ((package :description) :version)) (.equals name (package-name (package :description))))) (get-all-package-descriptions)))]
+                    (if (= nil check)
+                      (throw (PackageLoadException. (str "Package named \"" name "\" (version: " version  ") is not installed.")))
+                      check
+                      )
+                    ))
+  )
+
+
+
+
+
+(defn resolve-dep [name version]
+  (let [packages (get-all-package-descriptions)]
+    ;; load the name and version
+    (let [resolved  (filter (fn [x] (and
+                                     (.equals ((x :description) :name)    name)
+                                     (.equals ((x :description) :version) version)
+                                     )) packages)]
+
+      ;; make sure something was resovled
+      (if (= (count resolved) 0)
+        (throw (PackageLoadException. (str "Some required dependencies are missing. Missing Package: " name " version: " version)))
+        ;; ok, give it back
+        (let [resolved-package (first resolved)]
+         {
+          :dir (resolved-package :dir)
+          :description (resolved-package :description)
+          :name ((resolved-package :description) :name)
+          :version ((resolved-package :description) :version)
+
+          })
+        ))))
+;;
+;; takes a package description and resolves required dependencies to
+;; exact packages that are installed.
+;; it throws an error if some can't be found
+;;
+(defn missing-dep-list [deps]
+  (do
+    (doseq [x deps] (log/info "[package-info] - " (package-name-version x)))
+    ""
+    )
+ )
+
+(defn resolve-deps [package-description]
+  ;; step one: find the maximal set of dependencies
+   (let [deps (gather-deps package-description)]
+     (let [missing-deps (gather-missing-deps (deps :all-deps))]
+
+       ;; is everything installed?
+       (if (> (count missing-deps) 0)
+         (throw (PackageLoadException. (str "Some required dependencies are missing. See the output above for more information" (missing-dep-list missing-deps))))
+         ;; yes, let's start building the structure
+         (map (fn [x] (resolve-dep (x :package) (x :version))) (deps :all-deps))
+         ))))
+
+
+
+(defn index-resolved-deps [resolved-deps]
+  (r/reduce (fn [acc x] (assoc acc (x :name) x)) {} resolved-deps))
+
+
+
+
+

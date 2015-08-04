@@ -116,22 +116,23 @@
 
 
 (defn tools-for-project [project]
-  (map (fn [x]
-         (list ((x :tool) :name) ((x :tool) :version))
-         ) (project :checks))
+  (if (= nil (project :checks))
+         '()
+         (map (fn [x]
+                (list ((x :tool) :name) ((x :tool) :version))
+                ) (project :checks)))
 
   )
 
 (defn specs-for-project [project]
   ;; extract all specs nodes
   (let [specs (flatten (map (fn [x] (x :specs) )   (project :checks)))]
-    (map (fn [x] (list (x :name) (x :version))) specs)
+    
+    (map (fn [x] (list (x :name) (x :version))) (filter (fn [x] (not (= nil x))) specs))
     )
+
+  
   )
-
-
-
-
 
 
 ;; installs all the things needed for the local project by finding the packages and versions needed to satisfy
