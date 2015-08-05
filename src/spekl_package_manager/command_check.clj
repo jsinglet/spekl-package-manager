@@ -39,6 +39,21 @@
   )
 
 
+;; (defmacro loadcheck
+;;   [name & body]
+;;   `(fn [] (~(symbol ("spekl-package-manager.check/" name ))))
+;;   )
+
+
+
+
+
+;(macroexpand '(loadcheck a))
+
+;(loadcheck a)
+;
+
+
 ;; read the package file for the package that runs the tool
 ;; build a map for each package it DEPENDS on
 ;; :file, :dir, :description
@@ -72,10 +87,13 @@
                check/*specs* (package/get-required-specifications (config :specs))
                ] 
        
-       (check/default))
+
+       ((ns-resolve 'spekl-package-manager.check (symbol (config :check))))
+       )
      ))
   )
 
+;((resolve (symbol "check" "default")))
         ;;
         ;; pass in the rest of the raw environment 
         ;;
@@ -94,14 +112,28 @@
    }
   )
 
-(defn locate-and-run-check
-  ([name] (let [version (((package/locate-configured-check name) :tool) :version)] (run-configured-check (create-run-configuration
 
-                                                                                         (package/locate-configured-check name) (package/locate-package-check name version))
+(defn infer-check-tool-version [check-name]
+  (let [check (package/locate-configured-check check-name)]
+    (if (= nil ((check :tool) :version))
+      (((package/locate-package-check ((check :tool) :name)) :description) :version)
+      (((check :check) :tool) :version))))
 
 
-                                        )))
-  ([name version] (run-configured-check (create-run-configuration (package/locate-configured-check name version) (package/locate-package-check name version))))
+
+(defn infer-check-target [check-name]
+  (let [check (package/locate-configured-check check-name)]
+    (if (= nil (check :check))
+      "default"
+      (check :check))))
+
+(defn locate-and-run-check [check-name]
+  (let [tool-name (((package/locate-configured-check check-name) :tool) :name) check-target (infer-check-target check-name) tool-version (infer-check-tool-version check-name)]
+    (run-configured-check (create-run-configuration
+                           (package/locate-configured-check check-name)
+                           (package/locate-package-check    tool-name tool-version)
+                           )
+                          ))
   )
 
 
@@ -109,16 +141,13 @@
   (let [checks (package/load-configured-checks)]
     (log/info "[command-check] Running all checks for project...")
     (doall (map (fn [check]
-            (locate-and-run-check ((check :tool) :name) ((check :tool) :version))
+                  (locate-and-run-check (check :name))
             ) checks))
     ))
 
 
 (defn run-check [name rest]
-  (let [version (first rest)]
-    (case version
-      nil (locate-and-run-check name)
-      (locate-and-run-check name version))))
+  (locate-and-run-check name))
 
 ;;
 ;; This command can take an optional argument that specifies which "check" to run. If no argument is specified, it should run all checks in sequence. 
@@ -140,6 +169,7 @@
   )
 
 ;(run '() nil)
+
 
 ;;(load-file ".spm/openjml-esc-WORK/check.clj")
 ;;''(check/check)
