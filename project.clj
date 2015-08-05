@@ -14,7 +14,7 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [clj-http "1.1.2"]
                  [clj-glob "1.0.0"]
-                 [clj-jgit "0.8.8"]
+                 [clj-jgit "0.8.9"]
                  [org.slf4j/slf4j-log4j12 "1.7.1"]
                  [log4j/log4j "1.2.17" :exclusions [javax.mail/mail
                                                     javax.jms/jms

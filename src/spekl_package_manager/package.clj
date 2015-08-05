@@ -15,7 +15,7 @@
                          CantFindPackageException
                          )))
 
-
+(declare package-name)
 ;;
 ;; Functions for reading configurations
 ;;
@@ -29,6 +29,10 @@
 
 (defn create-package-url [name version]
   (str constants/api-raw constants/org-name "/" name "/" version "/" (constants/package-filename)  ))
+
+(defn create-package-base-url [package-description]
+  (str constants/api-raw constants/org-name "/" (package-name package-description) ".git" ))
+
 
 ;;
 ;; used mostly for debugging, this function allows a LOCAL version of a package file to override a remote one

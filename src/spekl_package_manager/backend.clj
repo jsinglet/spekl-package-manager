@@ -5,6 +5,7 @@
             [spekl-package-manager.constants :as constants]
             [spekl-package-manager.package :as package]
             [clj-http.client :as client]
+            [clojure.java.shell :as shell]
             )
   (:import [java.io FileNotFoundException File]
            [org.eclipse.jgit.lib RepositoryBuilder AnyObjectId]
@@ -238,4 +239,18 @@
 (defn register-project [name username]
   (client/get (str api-home "Package/create" ) {:query-params {"project" name "username" username}}))
 
+
+
+(defn install-package [package-description]
+  (do
+    ;; copy it down
+    (shell/sh "git" "clone" (package/create-package-base-url package-description) (package/make-package-path package-description))
+    ;; this command has problems in certain shell enviroments. the shell command is a workaround for the moment. 
+    ;(git/git-clone-full (package/create-package-base-url package-description)  (package/make-package-path package-description))
+
+    ;; switch to the correct version
+    (git/git-checkout (git/load-repo (package/make-package-path package-description)) (package-description :version))
+
+    )
+  )
 

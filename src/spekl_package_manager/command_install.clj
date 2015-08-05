@@ -5,6 +5,8 @@
             [spekl-package-manager.constants :as constants]
             [spekl-package-manager.download :as download]
             [spekl-package-manager.package :as package]
+            [spekl-package-manager.backend :as backend]
+
             )
   (:import (org.yaml.snakeyaml.scanner ScannerException)
            (org.spekl.spm.utils PackageLoadException
@@ -59,6 +61,7 @@
 
     ;; Step 1: Directories. Create the .spm and package directory where we will do our work
     (package/create-needed-dirs package-description)
+    (backend/install-package package-description)
     
     (log/info "[command-install] Downloading Required Assets... ")
 
@@ -74,6 +77,7 @@
                                     })
                            assets))]
         (do
+
           ;; Step 3: Run the installation commands
           ;;
           ;; Baked into the assumptions for these commands is the following:
@@ -88,7 +92,8 @@
           ;; Step 4: Cleanup any downloaded files.
           (log/info "[command-install] Performing cleanup tasks...")
           (cleanup-files assetenv)
-          ;; Step 5: Write out package description
+          
+          ;; Step 5: Write out package description (will overwrite the existing one)
           (log/info "[command-install] Writing out package description...")
           (package/write-description package-description)
           
@@ -175,6 +180,8 @@
 ;; any given package/tool/spec that is installed.
 ;;
 ;;
+
+
 (defn run [arguments options]
   (do (try
      (let [what (first arguments)]
