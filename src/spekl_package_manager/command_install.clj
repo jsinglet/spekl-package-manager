@@ -21,7 +21,8 @@
   (let [install-script (package/gather-install-commands package-description)]
     (doall     
      (map (fn [x]
-            (log/info "[command-install-scripts] " (x :description) "[" (x :cmd) " =>" (util/command-to-spm-cmd asset-env (x :cmd)) "]")
+            (log/info "[command-install-scripts] " (x :description) ; FOR DEBUGGING "[" (x :cmd) " =>" (util/command-to-spm-cmd asset-env (x :cmd)) "]"
+                      )
             ;; note here that "dir" is optional and defaults to the .spm directory
             (util/execute-command-in-directory asset-env (x :cmd) (str (package/make-package-path package-description) (x :dir)))
             ) install-script))))
@@ -29,7 +30,8 @@
 
 (defn cleanup-files [assetenv]
   (doall (map (fn [x]
-                (log/info "[command-install] Cleaning up resources for asset " (x :name) "[will delete: " (x :real-path) "]")
+                (log/info "[command-install] Cleaning up resources for asset " (x :name) ; FOR DEBUGGING"[will delete: " (x :real-path) "]"
+                          )
                 (io/delete-file (x :real-path))
                 ) assetenv))
   )

@@ -18,7 +18,7 @@ checks :
 
     tool: 
       name      : openjml-esc
-      version   : 0.0.2
+#      version   : 0.0.2
       pre_check :  # stuff to do before a check
       post_check:  # stuff to do before a check
 
