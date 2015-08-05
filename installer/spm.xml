@@ -64,7 +64,7 @@
                 <addTextToFile>
                     <file>${installdir}/spm.bat</file>
                     <text>@echo off
-${installdir}\java\bin\java -jar "${installdir}\spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"  %* 
+"${installdir}\java\bin\java" -jar "${installdir}\spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"  %* 
 </text>
                 </addTextToFile>
             </postInstallationActionList>
