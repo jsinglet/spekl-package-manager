@@ -39,20 +39,6 @@
   )
 
 
-;; (defmacro loadcheck
-;;   [name & body]
-;;   `(fn [] (~(symbol ("spekl-package-manager.check/" name ))))
-;;   )
-
-
-
-
-
-;(macroexpand '(loadcheck a))
-
-;(loadcheck a)
-;
-
 
 ;; read the package file for the package that runs the tool
 ;; build a map for each package it DEPENDS on
@@ -92,18 +78,6 @@
        )
      ))
   )
-
-;((resolve (symbol "check" "default")))
-        ;;
-        ;; pass in the rest of the raw environment 
-        ;;
-        ;; {
-        ;;  :specs (package/get-required-specifications (config :specs))
-        ;;  :project-files (expand-glob (config :paths))
-        ;;  :project-files-string (string/join " " (expand-glob (config :paths)))
-        ;;  }
-
-
 
 (defn create-run-configuration [configured-check package-data]
   {
