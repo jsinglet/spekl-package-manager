@@ -42,12 +42,24 @@
 ;; 
 ;;
 
+(defn create-spec-tool-ignores 
+  ([] (spit ".gitignore" ".spm/\nspekl.yml\n" :append true))
+  ([base] (spit (str base "/.gitignore") ".spm/\nspekl.yml\n" :append true))
+
+  )
+
+(defn create-ignores 
+  ([] (spit ".gitignore" ".spm/\n" :append true))
+  ([base] (spit (str base "/.gitignore") ".spm/\n" :append true))
+  )
+
+
 
 (defn init-project-with-config [project-file]
   (log/info "[new-project]" "Writing project file to spekl.yml")
   (spit (const/project-filename) project-file)
+  (create-ignores)
   (log/info "[new-project]" "Done."))
-
 
 (defn init-tool-with-config [project-file username]
   (do
@@ -57,11 +69,19 @@
         (log/info "[new-tool]" "Writing configuration file to: " (package/make-package-file-path (package/read-conf project-file)))
         (package/create-needed-dirs (package/read-conf project-file))
         (spit (package/make-package-file-path (package/read-conf project-file)) project-file)
+        (create-spec-tool-ignores (package/make-package-path (package/read-conf project-file)))
+
+        (spit (str (package/make-package-path (package/read-conf project-file)) "/" (const/check-file))
+              (templates/template-with-params "minimal-check" {}))
+
+        
         (backend/init-at (package/make-package-path (package/read-conf project-file)))
         )
       (do ;; otherwise we do our work in the .spm directory
         (log/info "[new-tool]" "Writing configuration file to package.yml")
         (spit (const/package-filename) project-file)
+        (create-spec-tool-ignores)
+        (spit (const/check-file) (templates/template-with-params "minimal-check" {}))
         (backend/init)
         )
       )
@@ -76,13 +96,15 @@
     (if (.exists (io/as-file (const/project-filename)))
       (do ;; if it's part of a project, we do our work in .spm
         (log/info "[new-spec]" "Writing configuration file to:" (package/make-package-file-path (package/read-conf project-file)))
-        (package/create-needed-dirs (package/read-conf project-file))
+        (package/create-needed-dirs (package/read-conf project-file))        
         (spit (package/make-package-file-path (package/read-conf project-file)) project-file)
+        (create-spec-tool-ignores (package/make-package-path (package/read-conf project-file)))
         (backend/init-at (package/make-package-path (package/read-conf project-file)))
         )
       (do ;; otherwise we do our work in the .spm directory
         (log/info "[new-spec]" "Writing configuration file to package.yml")
         (spit (const/package-filename) project-file)
+        (create-spec-tool-ignores)
         (backend/init)
         )
       )

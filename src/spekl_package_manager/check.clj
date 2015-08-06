@@ -84,6 +84,10 @@
   (let [runargs (doall (map (fn [x] (expand x)) args))]
     (stream-result (apply shell/sh runargs))))
 
+(defn run-no-output [& args]
+  (let [runargs (doall (map (fn [x] (expand x)) args))]
+    (apply shell/sh runargs)))
+
 
 (declare default)
 

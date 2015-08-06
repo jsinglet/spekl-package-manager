@@ -37,6 +37,14 @@
                     <destination>${installdir}</destination>
                     <name>programfileslinux</name>
                     <platforms>linux</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
+                        </distributionFile>
+                    </distributionFileList>
                 </folder>
                 <folder>
                     <description>Program Files</description>
@@ -47,6 +55,9 @@
                         <distributionFile>
                             <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
@@ -54,6 +65,14 @@
                     <destination>${installdir}</destination>
                     <name>programfilesosx</name>
                     <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
+                        </distributionFile>
+                    </distributionFileList>
                 </folder>
             </folderList>
             <postInstallationActionList>
@@ -67,6 +86,10 @@
 "${installdir}\java\bin\java" -jar "${installdir}\spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"  %* 
 </text>
                 </addTextToFile>
+                <changePermissions>
+                    <files>spm</files>
+                    <permissions>0755</permissions>
+                </changePermissions>
             </postInstallationActionList>
             <startMenuShortcutList>
                 <startMenuShortcut>

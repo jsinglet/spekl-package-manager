@@ -80,14 +80,14 @@
 
 ;; install the current directory's package or proces the spekl.yml  file
 (defn accuire-local-package []
-  (if (.exists (io/as-file (constants/project-filename)))
+  (if (.exists (io/as-file (constants/package-filename)))
     (do
-      (log/info "[command-install-project] Installing tools and specs for this project...")
-      (read-local-conf (constants/project-filename)))
-    (if (.exists (io/as-file (constants/package-filename)))
+      (log/info "[command-install-package] Picking up package from local directory...")
+      (read-local-conf (constants/package-filename)))
+    (if (.exists (io/as-file (constants/project-filename)))
       (do
-        (log/info "[command-install-package] Picking up package from local directory...")
-        (read-local-conf (constants/package-filename)))
+        (log/info "[command-install-project] Installing tools and specs for this project...")
+        (read-local-conf (constants/project-filename)))
       (do 
         (log/info "[command-install] Unable to determine project type! Please run \"spm init\" in this directory.")
         (System/exit 1)

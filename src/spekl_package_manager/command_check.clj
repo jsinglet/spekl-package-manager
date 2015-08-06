@@ -38,6 +38,10 @@
       ))
   )
 
+(defn fallback-to-default [check]
+  (if (= nil (check :check))
+    "default"
+    (check :check)))
 
 
 ;; read the package file for the package that runs the tool
@@ -74,7 +78,7 @@
                ] 
        
 
-       ((ns-resolve 'spekl-package-manager.check (symbol (config :check))))
+       ((ns-resolve 'spekl-package-manager.check (symbol (fallback-to-default config))))
        )
      ))
   )

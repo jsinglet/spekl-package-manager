@@ -6,6 +6,7 @@
 (defn package-filename [] (str (rt/working-dir) "package.yml"))
 (defn package-directory [] (str (rt/working-dir) ".spm"))
 
+
 (def org-name "Spekl")
 
 (def spm-home "http://10.173.204.196/")

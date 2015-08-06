@@ -30,7 +30,7 @@
 ;; where all the repos live
 ;; 
 (def repo-homes "../spm-root/")
-(def api-home  "http://localhost:8000/")
+
 
 ;;    
 (declare is-initial-version?)
@@ -237,7 +237,7 @@
   )
 
 (defn register-project [name username]
-  (client/get (str api-home "Package/create" ) {:query-params {"project" name "username" username}}))
+  (client/get (str constants/spm-home "Package/create" ) {:query-params {"project" name "username" username}}))
 
 
 
