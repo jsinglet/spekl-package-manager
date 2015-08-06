@@ -80,12 +80,13 @@
     )
   )
 
+
 (defn run [& args]
-  (let [runargs (doall (map (fn [x] (expand x)) args))]
+  (let [runargs (doall (map (fn [x] (expand x)) (flatten args)))]
     (stream-result (apply shell/sh runargs))))
 
 (defn run-no-output [& args]
-  (let [runargs (doall (map (fn [x] (expand x)) args))]
+  (let [runargs (doall (map (fn [x] (expand x)) (flatten args)))]
     (apply shell/sh runargs)))
 
 

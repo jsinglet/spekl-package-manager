@@ -73,7 +73,7 @@
                             })
 
                check/*project-files-string*  (string/join " " (expand-glob (config :paths)))
-               check/*project-files*  (string/join " " (expand-glob (config :paths)))
+               check/*project-files*         (expand-glob (config :paths))
                check/*specs* (package/get-required-specifications (config :specs))
                ] 
        
@@ -82,6 +82,7 @@
        )
      ))
   )
+
 
 (defn create-run-configuration [configured-check package-data]
   {
