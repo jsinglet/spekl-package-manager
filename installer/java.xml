@@ -15,7 +15,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>java-windows/*</origin>
+                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-windows/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -30,7 +30,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>java-linux/*</origin>
+                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-linux/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -45,7 +45,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>java-linux-x64/*</origin>
+                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-linux-x64/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -60,7 +60,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>java-solaris-sparc/*</origin>
+                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-solaris-sparc/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -75,7 +75,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>java-solaris-intel/*</origin>
+                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-solaris-intel/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -90,7 +90,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>java-osx/*</origin>
+                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-osx/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>

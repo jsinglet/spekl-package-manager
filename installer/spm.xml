@@ -105,7 +105,7 @@
             </startMenuShortcutList>
         </component>
         <include>
-            <file>java.xml</file>
+            <file>C:/Users/jls/Projects/spekl-package-manager/installer/java.xml</file>
         </include>
     </componentList>
     <enableRollback>1</enableRollback>

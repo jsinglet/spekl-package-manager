@@ -3,6 +3,8 @@
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [spekl-package-manager.util :as util]
+            [spekl-package-manager.versioning :as version]
+            [spekl-package-manager.net :as net]
             [spekl-package-manager.constants :as constants]
             [clojure.core.reducers :as r]
             [clojure.string :as string]
@@ -26,9 +28,15 @@
 (defn read-conf [conf]
   (yaml/parse-string conf))
 
-
+;;
+;; it's possible we have a naked version url. if that's the case we just attempt to get the tag. Otherwise we search though the pakage listing.
+;;
 (defn create-package-url [name version]
-  (str constants/api-raw constants/org-name "/" name "/" version "/" (constants/package-filename)  ))
+  (if (version/is-naked-version version)
+    (str constants/api-raw constants/org-name "/" name "/" version "/" (constants/package-filename)) ;; try to get it directly
+    ;; search for it
+    (create-package-url name ((net/find-satisfying-package name version) "version"))
+    ))
 
 (defn create-package-base-url [package-description]
   (str constants/api-raw constants/org-name "/" (package-name package-description) ".git" ))
@@ -150,8 +158,7 @@
     ;; filter out all the applicable commands
     (filter (fn [cmd-set] (my-platform? cmd-set)) package-install)))
 
-(defn gather-missing-deps [deps]
-  (filter (fn [x] (not (installed? (x :package) (x :version)))) deps))
+
 
 (defn extract-assets [package-description]
   (let [assets (package-description :assets)]
@@ -333,7 +340,7 @@
     ;; load the name and version
     (let [resolved  (filter (fn [x] (and
                                      (.equals ((x :description) :name)    name)
-                                     (.equals ((x :description) :version) version)
+                                     (version/version-satisfies ((x :description) :version) version )
                                      )) packages)]
 
       ;; make sure something was resovled
@@ -362,16 +369,9 @@
  )
 
 (defn resolve-deps [package-description]
-  ;; step one: find the maximal set of dependencies
    (let [deps (gather-deps package-description)]
-     (let [missing-deps (gather-missing-deps (deps :all-deps))]
-
-       ;; is everything installed?
-       (if (> (count missing-deps) 0)
-         (throw (PackageLoadException. (str "Some required dependencies are missing. See the output above for more information" (missing-dep-list missing-deps))))
-         ;; yes, let's start building the structure
-         (map (fn [x] (resolve-dep (x :package) (x :version))) (deps :all-deps))
-         ))))
+     (map (fn [x] (resolve-dep (x :package) (x :version))) (deps :all-deps))
+     ))
 
 
 
@@ -380,5 +380,13 @@
 
 
 
-
+(defn gather-missing-deps [deps]
+  (filter (fn [x]
+            (try 
+              (do
+                (resolve-dep (x :package) (x :version))
+                false
+                )
+              (catch PackageLoadException e true))
+            ) deps))
 

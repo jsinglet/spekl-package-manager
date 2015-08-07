@@ -1,5 +1,7 @@
 (ns spekl-package-manager.command-list
-  (:require [spekl-package-manager.net :as net]))
+  (:require [spekl-package-manager.net :as net]
+
+            ))
 
 
 (defn run-specs [packages]

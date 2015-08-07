@@ -23,8 +23,7 @@
            [java.util List]
            [org.eclipse.jgit.api.errors JGitInternalException]
            [org.eclipse.jgit.transport UsernamePasswordCredentialsProvider]
-           [org.eclipse.jgit.treewalk TreeWalk])
-  )
+           [org.eclipse.jgit.treewalk TreeWalk]))
 
 ;;
 ;; where all the repos live
