@@ -1,31 +1,41 @@
 (ns spekl-package-manager.command-list
   (:require [spekl-package-manager.net :as net]
-
+            [clojure.core.reducers :as r]
+            [clojure.string :as string]
+            
             ))
 
 
-(defn run-specs [packages]
+
+(def nl "\n                                                   ")
+
+(defn block-format-string [ls len]
+  (let [ss (into [] (seq ls))]
+    (string/join "" (flatten (r/reduce (fn [acc x]
+                          (if (and (> (count acc) 0 ) (= 0 (mod (count acc) len)))
+                            (conj acc [nl x])
+                            (conj acc x))) [] ss)))))
+
+(defn print-listing [packages]
   (doseq [x packages] (println
-                       (format "(%s) %-20s - %s (version: %s)" (x "kind") (x "name")  (x "description")  (x "version")))))
- 
-(defn run-tools [packages]
-  (doseq [x packages] (println
-                       (format "(%s)  %-20s - %s (version: %s)" (x "kind") (x "name")  (x "description")  (x "version")))))
+                       (format "(%s) %-20s %-20s - %s " (x "kind") (x "name")  (format "(v%s)" (x "version")) (block-format-string (x "description") 80)))))
 
 
 (defn run-list []
   (do
-    (run-tools (net/load-packages :tools))
-    (run-specs (net/load-packages :specs))
+    (print-listing (net/load-packages :tools))
+    (print-listing (net/load-packages :specs))
     ))
 
 
 (defn run [arguments]
   (case (first arguments)
-    "specs" (run-specs (net/load-packages :specs))
-    "tools" (run-tools (net/load-packages :tools))
+    "specs" (print-listing (net/load-packages :specs))
+    "tools" (print-listing (net/load-packages :tools))
     "all"   (run-list)
     nil     (run-list)
     (throw (IllegalArgumentException. "Invalid selection"))))
+
+
 
 
