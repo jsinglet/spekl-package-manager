@@ -253,3 +253,29 @@
     )
   )
 
+
+(defn extend-package
+  ([new-package-description extend-package-description]
+   (do
+     ;; copy it down
+     (shell/sh "git" "clone" (package/create-package-base-url extend-package-description) (package/make-package-path new-package-description))
+     ;; this command has problems in certain shell enviroments. the shell command is a workaround for the moment. 
+     ;;(git/git-clone-full (package/create-package-base-url package-description)  (package/make-package-path package-description))
+
+
+     
+     ))
+
+  ([new-package-description extend-package-description dest]
+   (do
+     ;; copy it down
+     (shell/sh "git" "clone" (package/create-package-base-url extend-package-description) dest)
+     ;;(git/git-clone-full (package/create-package-base-url package-description)  (package/make-package-path package-description))
+
+     
+     )
+
+
+   )
+  )
+

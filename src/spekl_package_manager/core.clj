@@ -26,6 +26,7 @@
             [spekl-package-manager.command-publish :as command-publish]
             [spekl-package-manager.command-cache :as command-cache]
             [spekl-package-manager.command-check :as command-check]
+            [spekl-package-manager.command-extend :as command-extend]
 
             [clojure.java.io :as io]
             [spekl-package-manager.runtime :as rt]
@@ -74,7 +75,7 @@
         "             project     Creates a new project that you can attach specs and checks to (default)"
         "             tool        Creates a new project for building a Spekl tool/check"
         "             specs       Creates a new project for writing a Spekl specification library."
-        "  extend   Create a new Spekl Project that extends another project. "
+        "  extend   Create a new Spekl specification project that extends an existing specification project. "
         ""
         "Package Management Actions:"
         "  list     Displays a list of available tools and specification libraries. May be one of:"
@@ -130,6 +131,7 @@
           "install" (command-install/run (rest arguments) options)
           "publish" (command-publish/run (rest arguments) options)
           "cache"   (command-cache/run (rest arguments) options)
+          "extend"   (command-extend/run (rest arguments) options)
           "check"   (command-check/run (rest arguments) options)          
           "help"    (exit 0 (usage summary))
           (exit 1 (usage summary)))
