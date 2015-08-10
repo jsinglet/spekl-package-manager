@@ -273,9 +273,9 @@
      ;;(git/git-clone-full (package/create-package-base-url package-description)  (package/make-package-path package-description))
 
      
-     )
+     )))
 
 
-   )
-  )
-
+(defn refresh-remote
+  ([package-description] (shell/sh "git" "pull" (package/create-package-base-url package-description)  ))
+  ([package-description dest] (shell/sh "git" "pull" (package/create-package-base-url package-description) :dir dest)))

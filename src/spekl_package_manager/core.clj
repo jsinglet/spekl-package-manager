@@ -27,7 +27,7 @@
             [spekl-package-manager.command-cache :as command-cache]
             [spekl-package-manager.command-check :as command-check]
             [spekl-package-manager.command-extend :as command-extend]
-
+            [spekl-package-manager.command-refresh :as command-refresh]
             [clojure.java.io :as io]
             [spekl-package-manager.runtime :as rt]
             [spekl-package-manager.progress :as pr]
@@ -85,7 +85,7 @@
         ""
         "  publish  Contribute back the current tool or specification project."
         ""
-        "For more information please see http://spekl-project.org/docs."]
+        "For more information please see: http://spekl-project.org/docs."]
        (string/join \newline)))
 
 
@@ -127,11 +127,11 @@
         (case (first arguments)
           "init"    (command-init/run (rest arguments) options)
           "list"    (command-list/run (rest arguments))
-          "silly"    (pr/silly-loop2)
           "install" (command-install/run (rest arguments) options)
           "publish" (command-publish/run (rest arguments) options)
           "cache"   (command-cache/run (rest arguments) options)
           "extend"   (command-extend/run (rest arguments) options)
+          "refresh"   (command-refresh/run (rest arguments) options)
           "check"   (command-check/run (rest arguments) options)          
           "help"    (exit 0 (usage summary))
           (exit 1 (usage summary)))
