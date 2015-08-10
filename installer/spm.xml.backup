@@ -1,7 +1,7 @@
 <project>
     <shortName>spm</shortName>
     <fullName>Spekl Package Manager</fullName>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <componentList>
         <component>
             <name>default</name>
@@ -39,7 +39,8 @@
                     <platforms>linux</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
@@ -53,7 +54,8 @@
                     <platforms>windows</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
@@ -70,7 +72,7 @@
                             <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
+                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
@@ -105,7 +107,7 @@
             </startMenuShortcutList>
         </component>
         <include>
-            <file>java.xml</file>
+            <file>C:/Users/jls/Projects/spekl-package-manager/installer/java.xml</file>
         </include>
     </componentList>
     <enableRollback>1</enableRollback>
