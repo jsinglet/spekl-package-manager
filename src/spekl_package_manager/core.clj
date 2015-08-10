@@ -53,18 +53,20 @@
         options-summary
         ""
         "General Actions:"
-        "  install  Install any required specs and tools for this project"
+        "  install  Install any required specs and tools for this project. You may specify "
+        "           an optional argument that is a package name or a package name and a version"
+        "           of the package to install."
         "  help     Displays this message"
         ""
         "Check-Related Actions:"
-        "  add      Adds a new check to this project                     "
-        "  remove   Removes a named check from this project              "
-        "  check    Run the configured tools on the current project"
+        "  check    Run the configured tools on the current project. The checks will be run using the "
+        "           configured checks in the spekl.yml file. If an argument to this command is supplied, then"
+        "           only the named check will be run."
         ""
         "Specification-Related Actions:"
-        "  attach   Attaches a named specification to this project       "
-        "  release  Unattaches a named specification from this project   "
-        "  refresh  Checks the central repository for updates to any atttached specifications"
+        "  refresh  Checks the central repository for updates to any atttached specifications. This process "
+        "           normally happens during the checking of your project, however it can be invoked manually"
+        "           using this command."
         "  find     Searches spekl for specification libraries that might work for your current project"
         ""
         "Project-Related Actions:"
@@ -72,6 +74,7 @@
         "             project     Creates a new project that you can attach specs and checks to (default)"
         "             tool        Creates a new project for building a Spekl tool/check"
         "             specs       Creates a new project for writing a Spekl specification library."
+        "  extend   Create a new Spekl Project that extends another project. "
         ""
         "Package Management Actions:"
         "  list     Displays a list of available tools and specification libraries. May be one of:"
@@ -79,9 +82,9 @@
         "             specs       Displays a list of available specification libraries."
         "             tools       Displays a list of available verification tools (checks)."
         ""
-        "  publish  Contribute back the specs you've written for this project."
+        "  publish  Contribute back the current tool or specification project."
         ""
-        "For more information please see http://spekl.org/docs."]
+        "For more information please see http://spekl-project.org/docs."]
        (string/join \newline)))
 
 
@@ -89,11 +92,7 @@
 
 (def spekl-options
   ;; An option with a required argument
-  [["-p" "--port PORT" "Port number"
-    :default 80
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
-
+  [
    ["-d" "--dir DIRECTORY" "The effective project directory. Defaults to the current directory."
     :id :directory
     :default "."
