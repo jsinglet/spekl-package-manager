@@ -32,10 +32,11 @@
       ;; it does!
       (do
         ;; pull in the changes
-        (log/info "[command-refresh] Pulling in latest changes to upstream package `" extended "`")
+        (log/info "[command-refresh] Pulling in latest changes to upstream package" (str "`" extended "`"))
         ;; see if the upstream package needs to be refreshed
-        (backend/refresh-remote (package/accuire-remote-package extended) dest)
-        (refresh-spec dest (package/accuire-remote-package extended))))))
+        (let [remote-package (package/accuire-remote-package extended nil)]
+          (backend/refresh-remote remote-package dest)
+          (refresh-spec dest remote-package))))))
 
 (defn get-project-specs []
   (let [checks (package/load-configured-checks)]
