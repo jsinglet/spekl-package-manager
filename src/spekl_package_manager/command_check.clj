@@ -49,8 +49,6 @@
 ;; :file, :dir, :description
 
 
-(seq? ((first ((package/read-local-conf "spekl.yml") :checks)) :classpath))
-
 
 (defn run-configured-check [configuration]
   (let [package (configuration :package-data) config (configuration :configured-check)]
