@@ -1,7 +1,7 @@
 <project>
     <shortName>spm</shortName>
     <fullName>Spekl Package Manager</fullName>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <componentList>
         <component>
             <name>default</name>
@@ -76,6 +76,29 @@
                         </distributionFile>
                     </distributionFileList>
                 </folder>
+                <folder>
+                    <description>Support Tools</description>
+                    <destination>${installdir}/tools</destination>
+                    <name>toolswin</name>
+                    <platforms>windows</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>C:/Program Files (x86)/Git</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Support Tools</description>
+                    <destination>${installdir}/tools</destination>
+                    <name>toolslinux</name>
+                    <platforms>linux</platforms>
+                </folder>
+                <folder>
+                    <description>Support Tools</description>
+                    <destination>${installdir}/tools</destination>
+                    <name>toolsosx</name>
+                    <platforms>osx</platforms>
+                </folder>
             </folderList>
             <postInstallationActionList>
                 <addDirectoryToPath>
@@ -85,6 +108,10 @@
                 <addTextToFile>
                     <file>${installdir}/spm.bat</file>
                     <text>@echo off
+
+setlocal
+SET PATH=${installdir}\tools\Git\bin;%PATH%
+
 "${installdir}\java\bin\java" -jar "${installdir}\spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"  %* 
 </text>
                 </addTextToFile>
@@ -112,6 +139,7 @@
     </componentList>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
+    <installationType>upgrade</installationType>
     <vendor>UCF Formal Methods Lab</vendor>
     <parameterList>
         <directoryParameter>
@@ -119,7 +147,7 @@
             <description>Installer.Parameter.installdir.description</description>
             <explanation>Installer.Parameter.installdir.explanation</explanation>
             <value></value>
-            <default>${platform_install_prefix}/${product_shortname}-${product_version}</default>
+            <default>${platform_install_prefix}/${product_shortname}</default>
             <allowEmptyValue>0</allowEmptyValue>
             <ask>yes</ask>
             <cliOptionName>prefix</cliOptionName>

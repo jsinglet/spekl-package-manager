@@ -1,5 +1,6 @@
 #!/bin/sh
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+PATH="$DIR/tools/":$PATH
 
 java -jar "$DIR/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar" $@

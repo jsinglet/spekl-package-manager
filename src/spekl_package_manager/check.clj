@@ -44,7 +44,7 @@
 (def ^:dynamic *project-files-string* nil)
 (def ^:dynamic *project-files* nil)
 (def ^:dynamic *specs* nil)
-
+(def ^:dynamic *check-configuration* nil)
 
 (defmacro defcheck
   [name & body]
@@ -91,4 +91,6 @@
 
 
 (declare default)
+
+
 

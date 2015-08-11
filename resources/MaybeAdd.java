@@ -3,6 +3,9 @@
 // This program contains two errors. Can you find them?
 //
 public class MaybeAdd {
+
+    FooClass a;
+    
      //@ requires a > 0;
      //@ requires b > 0;
      //@ ensures \result == a+b;

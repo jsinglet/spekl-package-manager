@@ -3,6 +3,9 @@
             [spekl-package-manager.constants :as constants]
             [clojure.string :as str]
             [clojure.java.shell :as shell]
+            [clojure.core.reducers :as r]
+            [org.satta.glob :as glob]
+            [clojure.string :as string]
             ))
 
 
@@ -47,3 +50,10 @@
   [seq elm]  
   (some #(= elm %) seq))
 
+
+
+(defn expand-glob [globs]
+  (let [groups (map (fn [x] (glob/glob (.trim x))) globs)]
+    ;; combine
+    (map (fn [x] (.getPath x)) (r/reduce (fn [acc x] (concat acc x)) []  groups))
+    ))

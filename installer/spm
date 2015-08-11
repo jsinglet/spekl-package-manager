@@ -2,4 +2,17 @@
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-"$DIR/java/bin/java" -jar "$DIR/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar" $@
+# cygwin requires special treatment...
+
+if  uname | grep -iq CYGWIN
+then
+    JARFILE=`cygpath -w "$DIR/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"`
+else
+    JARFILE="$DIR/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"
+fi
+
+PATH="$DIR/tools/Git/bin/":$PATH
+
+
+"$DIR/java/bin/java" -jar "$JARFILE" $@
+ 

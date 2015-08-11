@@ -48,6 +48,10 @@
 ;; build a map for each package it DEPENDS on
 ;; :file, :dir, :description
 
+
+(seq? ((first ((package/read-local-conf "spekl.yml") :checks)) :classpath))
+
+
 (defn run-configured-check [configuration]
   (let [package (configuration :package-data) config (configuration :configured-check)]
    (do
@@ -71,7 +75,7 @@
                             :path-to-package (package :dir)
                             :resolved-packages (package/index-resolved-deps (package/resolve-deps (package :description)))
                             })
-
+               check/*check-configuration*   config
                check/*project-files-string*  (string/join " " (expand-glob (config :paths)))
                check/*project-files*         (expand-glob (config :paths))
                check/*specs* (package/get-required-specifications (config :specs))
