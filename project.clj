@@ -4,8 +4,8 @@
   :resource-paths ["resources/" "resources/packages/"]
   :libdir-path "target/deps"
   :java-source-paths ["src/java"]
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "BSD"
+            :url "http://opensource.org/licenses/isc-license"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clj-yaml "0.4.0"]
                  [org.clojure/tools.cli "0.3.1"]
