@@ -14,6 +14,8 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [clj-http "1.1.2"]
                  [clj-glob "1.0.0"]
+                 [net.n01se/clojure-jna "1.0.0"]
+
                  [clj-jgit "0.8.9"]
                  [org.apache.maven/maven-artifact "3.3.3"]
                  [org.slf4j/slf4j-log4j12 "1.7.1"]

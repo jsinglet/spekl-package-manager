@@ -1,6 +1,21 @@
 #!/bin/sh
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+if  uname | grep -iq CYGWIN
+then
+    JARFILE=`cygpath -w "$DIR/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"`
+    ENV_FLAGS="-Dshellenv=CYGWIN"
+else
+    JARFILE="$DIR/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"
+    ENV_FLAGS="-Dshellenv=other"
+fi
+
+
+
 PATH="$DIR/tools/":$PATH
 
-java -jar "$DIR/target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar" $@
+
+java $ENV_FLAGS -jar "$JARFILE" $@
+
+

@@ -1,7 +1,7 @@
 <project>
     <shortName>spm</shortName>
     <fullName>Spekl Package Manager</fullName>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <componentList>
         <component>
             <name>default</name>
@@ -92,6 +92,11 @@
                     <destination>${installdir}/tools</destination>
                     <name>toolslinux</name>
                     <platforms>linux</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>C:/Users/jls/Applications/git-annex-standalone-amd64.tar/git-annex-standalone-amd64/Git</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
                 </folder>
                 <folder>
                     <description>Support Tools</description>

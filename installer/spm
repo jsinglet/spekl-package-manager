@@ -7,12 +7,14 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 if  uname | grep -iq CYGWIN
 then
     JARFILE=`cygpath -w "$DIR/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"`
+    ENV_FLAGS="-Dshellenv=CYGWIN"
 else
     JARFILE="$DIR/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar"
+    ENV_FLAGS="-Dshellenv=other"
 fi
 
 PATH="$DIR/tools/Git/bin/":$PATH
 
 
-"$DIR/java/bin/java" -jar "$JARFILE" $@
+"$DIR/java/bin/java" $ENV_FLAGS -jar "$JARFILE" $@
  

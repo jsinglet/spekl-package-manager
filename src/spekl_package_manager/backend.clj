@@ -4,6 +4,7 @@
             [clojure.tools.logging :as log]
             [spekl-package-manager.constants :as constants]
             [spekl-package-manager.package :as package]
+            [net.n01se.clojure-jna :as jna]
             [clj-http.client :as client]
             [clojure.java.shell :as shell]
             )
@@ -19,6 +20,7 @@
                                        OpenSshConfig$Host SshSessionFactory]
            [org.eclipse.jgit.util FS]
            [org.eclipse.jgit.merge MergeStrategy]
+           [org.spekl.spm.utils GetPasswordPrompt]
            [clojure.lang Keyword]
            [java.util List]
            [org.eclipse.jgit.api.errors JGitInternalException]
@@ -185,27 +187,55 @@
                                   (.call))))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; Scary native stuff (used for cygwin)
+(defn get-char []
+  (jna/invoke Integer msvcrt/getchar))
 
+(defn capture-password [vect-buff]
+  (let [c (get-char)]
+    (if (or (= 13 c) (= 10 c))
+      (apply str (map char vect-buff))
+      (do (print "*") (flush) (capture-password (conj vect-buff c)))
+      )))
+
+(defn secure-get-password [prompt]
+  (do
+    (print prompt) (flush)
+    (capture-password '[])
+    ) 
+  )
+
+;;
+;; another idea! shell out to a platform native exe!
+;;
+
+;;;;;;;;;;;;;;;;;;;;;;;
+
+;;
+;; this function is a nightmare of compatibility problems
+;; 
 (defn get-password [username]
+  
   (let [msg (str "Password for <" username ">:") ]
 
-
-    ;; (do
-  ;;   (print msg)
-  ;;   (flush)
-  ;;   (let [pwd (read-line)]
-  ;;     pwd)
-  ;;   )))
-    (try 
-      (String/valueOf (.readPassword (System/console) msg nil))
-      (catch NullPointerException e (
-                                     (do
-                                       (print msg)
-                                       (flush)
-                                       (let [pwd (read-line)]
-                                         pwd)
-                                       )
-                                     )))))
+    (if (= (System/getProperty "shellenv") "CYGWIN")
+      (GetPasswordPrompt/getPasswordFor username)
+      (try
+        (String/valueOf (.readPassword (System/console) msg nil))
+        (catch NullPointerException e (
+                                       (do
+                                         (print msg)
+                                         (flush)
+                                         (let [pwd (read-line)]
+                                           pwd)
+                                         )
+                                       ))
+        )
+      
+      )
+    ))
 
 
 (defn push-version [path]
