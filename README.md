@@ -1,44 +1,32 @@
-# spekl-package-manager
+# The Spekl Package Manager
 
-FIXME: description
+The number of systems for specifying program behavior grows every year; while significant enhancements are made in these systems, both in terms of their capability and usability, little progress has been made in the way of making the act of specification authoring and usage easier. 
+
+Spekl is a system designed to make the specification authoring lifecycle easier. 
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download an installer from over on the [releases](https://github.com/jsinglet/spekl-package-manager/releases) page. 
 
-## Usage
-
-FIXME: explanation
-
-    $ java -jar spekl-package-manager-0.1.0-standalone.jar [args]
-
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright (c) 2015, John L. Singleton <jls@cs.ucf.edu>
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-
-## Some Commands to Make Life Easy
+## Some Commands for Spekl Developers
 
 # Build the Classpath
 
