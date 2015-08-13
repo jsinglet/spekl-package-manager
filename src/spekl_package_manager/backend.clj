@@ -312,7 +312,7 @@
 
 (defn get-conflicts [dest]
   (let [conflicts  (shell/sh "git" "diff" "--name-only" "--diff-filter=U" :dir dest)]
-    (string/split (conflicts :out) #"\n")))
+    (filter (fn [x] (not (= "" x))) (string/split (conflicts :out) #"\n"))))
 
 (defn detect-conflict-errors [dest]
   (if (> (count (get-conflicts dest)) 0)
@@ -344,6 +344,9 @@
       (shell/sh "git" "stash" "apply" :dir dest)
       (shell/sh "git" "stash" "drop" :dir dest)
 
+      (detect-conflict-errors dest)
+
+      
       ;; see how far ahead we are now
       (let [post-ll (get-number-commits dest)]
 

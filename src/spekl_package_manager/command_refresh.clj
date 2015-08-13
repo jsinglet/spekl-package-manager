@@ -46,7 +46,7 @@
     (log/info "[command-refresh] Refreshing specs in this project...")
     (let [checks (package/load-configured-checks)]
       (doall
-       (map (fn [x]  (refresh-spec (package/make-package-file-path (x :description)) (x :description)))
+       (map (fn [x]  (refresh-spec (package/make-package-path (x :description)) (x :description)))
             (get-project-specs))
        )))
 
