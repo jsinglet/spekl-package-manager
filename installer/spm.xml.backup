@@ -1,7 +1,8 @@
 <project>
     <shortName>spm</shortName>
-    <fullName>Spekl Package Manager</fullName>
-    <version>0.0.4</version>
+    <fullName>The Spekl Package Manager</fullName>
+    <version>0.0.3</version>
+    <licenseFile>C:\Users\jls\Projects\spekl-package-manager\LICENSE</licenseFile>
     <componentList>
         <component>
             <name>default</name>
@@ -142,10 +143,17 @@ SET PATH=${installdir}\tools\Git\bin;%PATH%
             <file>C:/Users/jls/Projects/spekl-package-manager/installer/java.xml</file>
         </include>
     </componentList>
+    <disableSplashScreen>1</disableSplashScreen>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <installationType>upgrade</installationType>
     <vendor>UCF Formal Methods Lab</vendor>
+    <licenseFileList>
+        <licenseFile>
+            <code>en</code>
+            <file>C:\Users\jls\Projects\spekl-package-manager\LICENSE</file>
+        </licenseFile>
+    </licenseFileList>
     <parameterList>
         <directoryParameter>
             <name>installdir</name>
