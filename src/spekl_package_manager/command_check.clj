@@ -85,7 +85,6 @@
      ))
   )
 
-
 (defn create-run-configuration [configured-check package-data]
   {
    :configured-check configured-check
@@ -98,7 +97,7 @@
   (let [check (package/locate-configured-check check-name)]
     (if (= nil ((check :tool) :version))
       (((package/locate-package-check ((check :tool) :name)) :description) :version)
-      (((check :check) :tool) :version))))
+      ((check :tool) :version))))
 
 
 

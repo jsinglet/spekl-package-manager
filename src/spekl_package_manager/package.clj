@@ -18,6 +18,8 @@
                          )))
 
 (declare package-name)
+(declare resolve-dep)
+(declare locate-package-check)
 ;;
 ;; Functions for reading configurations
 ;;
@@ -253,16 +255,7 @@
 ;; TODO - throw an error if any specs can't be found
 ;;
 (defn get-required-specifications [specs]
-  (let [all-packages (get-all-package-descriptions)]
-    (let [found-specs  (filter (fn [x] (package-is-required-spec (x :description) specs)) all-packages)]
-
-      ;; make sure we found everything we tried to find
-      (if (= (count found-specs) (count specs))
-        found-specs
-        (throw (PackageLoadException. (str "Some specification packages were not found.")))
-        )
-
-      )))
+  (doall (map (fn [x] (locate-package-check (x :name) (x :version))) specs)))
 
 ;; to do this the following is done
 ;; we create a hash grouping :package_name => [installed packages]
@@ -315,6 +308,8 @@
                     ))
   )
 
+
+
 (defn locate-package-check
   ([name] (let [check  (first (filter (fn [package] (.equals name (package-name (package :description)))) (only-current-packages)))]
             (if (= nil check)
@@ -323,12 +318,17 @@
               )
             ))
  
-  ([name version] (let [check  (first (filter (fn [package] (and  (.equals version ((package :description) :version)) (.equals name (package-name (package :description))))) (get-all-package-descriptions)))]
-                    (if (= nil check)
-                      (throw (PackageLoadException. (str "Package named \"" name "\" (version: " version  ") is not installed.")))
-                      check
-                      )
-                    ))
+  ([name version] (if (= nil version)
+                    (locate-package-check name)
+                    (resolve-dep name version))
+
+   ;; (let [check  (first (filter (fn [package] (and  (.equals version ((package :description) :version)) (.equals name (package-name (package :description))))) (get-all-package-descriptions)))]
+   ;;   (if (= nil check)
+   ;;     (throw (PackageLoadException. (str "Package named \"" name "\" (version: " version  ") is not installed.")))
+   ;;     check
+   ;;     )
+   ;;   )
+   )
   )
 
 

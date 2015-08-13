@@ -5,6 +5,8 @@
             [spekl-package-manager.constants :as constants]
             [spekl-package-manager.package :as package]
             [net.n01se.clojure-jna :as jna]
+            [clojure.string :as string]
+
             [clj-http.client :as client]
             [clojure.java.shell :as shell]
             )
@@ -305,7 +307,54 @@
      
      )))
 
+(defn get-number-commits [path]
+  (count (git/git-log (git/load-repo path))))
+
+(defn get-conflicts [dest]
+  (let [conflicts  (shell/sh "git" "diff" "--name-only" "--diff-filter=U" :dir dest)]
+    (string/split (conflicts :out) #"\n")))
+
+(defn detect-conflict-errors [dest]
+  (if (> (count (get-conflicts dest)) 0)
+    (throw (Exception. (str "Spekl cannot automatically merge upstream changes from an extending package. The files conflicting are: " (string/join "," (get-conflicts dest)))))))
+
+(defn do-refresh-remote [package-description dest]
+  (do
+    (let [pre-ll (get-number-commits dest)]
+
+      ;; stash
+      (shell/sh "git" "stash" :dir dest)
+      
+      ;; pull down changes
+      (shell/sh "git" "pull" (package/create-package-base-url package-description) :dir dest)
+
+      (shell/sh "git" "checkout" "--ours" (constants/package-filename) :dir dest)
+
+      (shell/sh "git" "add" (constants/package-filename) :dir dest)
+
+      ;;
+      ;; see if there are conflicts that can't be automatically merged
+      ;;
+      (detect-conflict-errors dest)
+      
+      ;; this resolves
+      (git/git-commit (git/load-repo dest) (str "Merged in upstream changes from " (package-description :name)) (extract-author-info dest))
+
+      ;; apply and drop  the stash
+      (shell/sh "git" "stash" "apply" :dir dest)
+      (shell/sh "git" "stash" "drop" :dir dest)
+
+      ;; see how far ahead we are now
+      (let [post-ll (get-number-commits dest)]
+
+        (if (> (- post-ll pre-ll) 1)
+          (do (log/info "[command-refresh] Synced" (- (- post-ll pre-ll) 1) "changes..."))
+          (do (log/info "[command-refresh] No changes to sync"))))
+      
+      ;; determine if there are conflicts
+     )))
 
 (defn refresh-remote
-  ([package-description] (shell/sh "git" "pull" (package/create-package-base-url package-description)  ))
-  ([package-description dest] (shell/sh "git" "pull" (package/create-package-base-url package-description) :dir dest)))
+  ([package-description] (do-refresh-remote package-description "."))
+  ([package-description dest] (do-refresh-remote package-description dest)))
+
