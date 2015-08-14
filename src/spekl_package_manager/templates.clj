@@ -14,7 +14,10 @@
 (defn load-ftl-resource
   "Gets the template data from the resources directory for the given file"
   [template]
-  (slurp (io/resource (str template ".ftl"))))
+  (let [template-name (str template ".ftl")]
+    (if (.exists (io/as-file template))
+      (slurp template)
+      (slurp (io/resource template-name)))))
 
 (defn load-template [template]
   (Template. "name" (StringReader. (load-ftl-resource template)) ftl-configuration))
@@ -25,5 +28,7 @@
       (.process t params writer)
       (.toString writer)
       )))
+
+
 
 
