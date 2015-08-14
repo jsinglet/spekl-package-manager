@@ -10,7 +10,8 @@
             )
   (:import (org.yaml.snakeyaml.scanner ScannerException)
            (org.spekl.spm.utils PackageLoadException
-                                CantFindPackageException)))
+                                CantFindPackageException
+                                EnvironmentException)))
  
 
 (defn print-missing-deps [deps]
@@ -48,6 +49,10 @@
   (log/info "[command-install] Starting install of package" (package/package-name-version package-description))
 
   (do
+
+    ;; Precheck: Check environment restrictions
+    (package/environment-meets package-description)
+    
     ;; Step 0: install anything it depends on (these will always fetch from remote)
     (log/info "[command-install] Examining dependencies...")
     (let [deps (package/gather-deps package-description)]
@@ -201,6 +206,7 @@
      (catch CantFindPackageException e (log/info "[command-install] Cannot find a package matching that description: " (.getMessage e)))
      (catch ScannerException e (log/info "[command-install] Invalid package description encountered for one or more packages: " (.getMessage e)))
      (catch PackageLoadException e (log/info "[command-install] Unable to load package. " (.getMessage e)))
+     (catch EnvironmentException e (log/info "[command-install] Environmental Error: " (.getMessage e)))
 
      ))
   (System/exit 0)

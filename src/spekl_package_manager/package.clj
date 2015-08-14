@@ -8,6 +8,8 @@
             [spekl-package-manager.constants :as constants]
             [clojure.core.reducers :as r]
             [clojure.string :as string]
+            [clojure.java.shell :as shell]
+
 
             )
   (:import
@@ -15,6 +17,7 @@
     (org.spekl.spm.utils PackageLoadException
                          ProjectConfigurationException
                          CantFindPackageException
+                         EnvironmentException
                          )))
 
 (declare package-name)
@@ -107,7 +110,7 @@
   (not (= nil (o :one-of))))
 
 (defn my-platform? [o]
-  (or (= (util/get-my-platform) (o :platform)) (= (o :platform) "all")))
+  (or (= nil (o :platform)) (or (= (util/get-my-platform) (o :platform)) (= (o :platform) "all"))))
 
 (defn is-dep? [o] (and (not (is-one-of? o)) (my-platform? o)))
 
@@ -390,3 +393,20 @@
               (catch PackageLoadException e true))
             ) deps))
 
+
+;;
+;; assumes [{cmd: "some command", :matches "some regumar expression" message: if I fail.
+;;
+
+(defn cmd-does-not-meet-requirements [cmd]
+  (let [pattern (re-pattern (cmd :matches))]
+    (let [res (apply shell/sh (string/split (cmd :cmd) #" "))]
+      (or (not (= (res :exit) 0)) (= nil (re-find pattern (str (res :out) (res :err))))))))
+
+
+(defn environment-meets [package-description]
+  (if-not (= nil (package-description :assumes))
+    (let [invalid-cmds (doall (filter (fn [cmd] (and (my-platform? cmd) (cmd-does-not-meet-requirements cmd)   )) (package-description :assumes)))])
+
+    (if (> (count invalid-cmds) 0)
+      (throw (EnvironmentException. (str "Your environment does not meet the requirements for this package: " ((first invalid-cmds) :message)))))))
