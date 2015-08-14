@@ -399,9 +399,11 @@
 ;;
 
 (defn cmd-does-not-meet-requirements [cmd]
-  (let [pattern (re-pattern (cmd :matches))]
-    (let [res (apply shell/sh (string/split (cmd :cmd) #" "))]
-      (or (not (= (res :exit) 0)) (= nil (re-find pattern (str (res :out) (res :err))))))))
+  (try
+   (let [pattern (re-pattern (cmd :matches))]
+     (let [res (apply shell/sh (string/split (cmd :cmd) #" "))]
+       (or (not (= (res :exit) 0)) (= nil (re-find pattern (str (res :out) (res :err)))))))
+   (catch Exception e true)))
 
 
 (defn environment-meets [package-description]
