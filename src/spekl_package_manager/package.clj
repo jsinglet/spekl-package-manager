@@ -406,7 +406,6 @@
 
 (defn environment-meets [package-description]
   (if-not (= nil (package-description :assumes))
-    (let [invalid-cmds (doall (filter (fn [cmd] (and (my-platform? cmd) (cmd-does-not-meet-requirements cmd)   )) (package-description :assumes)))])
-
-    (if (> (count invalid-cmds) 0)
-      (throw (EnvironmentException. (str "Your environment does not meet the requirements for this package: " ((first invalid-cmds) :message)))))))
+    (let [invalid-cmds (doall (filter (fn [cmd] (and (my-platform? cmd) (cmd-does-not-meet-requirements cmd)   )) (package-description :assumes)))]
+      (if (> (count invalid-cmds) 0)
+        (throw (EnvironmentException. (str "Your environment does not meet the requirements for this package: " ((first invalid-cmds) :message))))))))
