@@ -1,8 +1,8 @@
 <project>
     <shortName>spm</shortName>
     <fullName>The Spekl Package Manager</fullName>
-    <version>0.0.3</version>
-    <licenseFile>../LICENSE</licenseFile>
+    <version>0.0.5</version>
+    <licenseFile>C:/Users/jls/Projects/spekl-package-manager/LICENSE</licenseFile>
     <componentList>
         <component>
             <name>default</name>

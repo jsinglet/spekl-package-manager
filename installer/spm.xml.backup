@@ -1,8 +1,8 @@
 <project>
     <shortName>spm</shortName>
     <fullName>The Spekl Package Manager</fullName>
-    <version>0.0.3</version>
-    <licenseFile>C:\Users\jls\Projects\spekl-package-manager\LICENSE</licenseFile>
+    <version>0.0.5</version>
+    <licenseFile>C:/Users/jls/Projects/spekl-package-manager/LICENSE</licenseFile>
     <componentList>
         <component>
             <name>default</name>
@@ -151,7 +151,7 @@ SET PATH=${installdir}\tools\Git\bin;%PATH%
     <licenseFileList>
         <licenseFile>
             <code>en</code>
-            <file>C:\Users\jls\Projects\spekl-package-manager\LICENSE</file>
+            <file>C:/Users/jls/Projects/spekl-package-manager/LICENSE</file>
         </licenseFile>
     </licenseFileList>
     <parameterList>
