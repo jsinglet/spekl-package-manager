@@ -2,7 +2,7 @@
     <shortName>spm</shortName>
     <fullName>The Spekl Package Manager</fullName>
     <version>0.0.3</version>
-    <licenseFile>C:\Users\jls\Projects\spekl-package-manager\LICENSE</licenseFile>
+    <licenseFile>../LICENSE</licenseFile>
     <componentList>
         <component>
             <name>default</name>
@@ -37,14 +37,14 @@
                     <description>Program Files</description>
                     <destination>${installdir}</destination>
                     <name>programfileslinux</name>
-                    <platforms>linux</platforms>
+                    <platforms>linux-x64</platforms>
                     <distributionFileList>
                         <distributionFile>
                             <allowWildcards>1</allowWildcards>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
+                            <origin>../target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
+                            <origin>spm</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
@@ -56,10 +56,10 @@
                     <distributionFileList>
                         <distributionFile>
                             <allowWildcards>1</allowWildcards>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
+                            <origin>../target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
+                            <origin>spm</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
@@ -70,10 +70,10 @@
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/installer/spm</origin>
+                            <origin>spm</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/Users/jls/Projects/spekl-package-manager/target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
+                            <origin>../target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
@@ -93,11 +93,6 @@
                     <destination>${installdir}/tools</destination>
                     <name>toolslinux</name>
                     <platforms>linux</platforms>
-                    <distributionFileList>
-                        <distributionDirectory>
-                            <origin>C:/Users/jls/Applications/git-annex-standalone-amd64.tar/git-annex-standalone-amd64/Git</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
                 </folder>
                 <folder>
                     <description>Support Tools</description>
@@ -122,9 +117,14 @@ SET PATH=${installdir}\tools\Git\bin;%PATH%
 </text>
                 </addTextToFile>
                 <changePermissions>
-                    <files>spm</files>
+                    <files>${installdir}/spm</files>
                     <permissions>0755</permissions>
                 </changePermissions>
+                <changeOwnerAndGroup>
+                    <files>${installdir}/*</files>
+                    <group>root</group>
+                    <owner>root</owner>
+                </changeOwnerAndGroup>
             </postInstallationActionList>
             <startMenuShortcutList>
                 <startMenuShortcut>
@@ -140,18 +140,19 @@ SET PATH=${installdir}\tools\Git\bin;%PATH%
             </startMenuShortcutList>
         </component>
         <include>
-            <file>C:/Users/jls/Projects/spekl-package-manager/installer/java.xml</file>
+            <file>java.xml</file>
         </include>
     </componentList>
     <disableSplashScreen>1</disableSplashScreen>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <installationType>upgrade</installationType>
+    <saveRelativePaths>1</saveRelativePaths>
     <vendor>UCF Formal Methods Lab</vendor>
     <licenseFileList>
         <licenseFile>
             <code>en</code>
-            <file>C:\Users\jls\Projects\spekl-package-manager\LICENSE</file>
+            <file>../LICENSE</file>
         </licenseFile>
     </licenseFileList>
     <parameterList>
