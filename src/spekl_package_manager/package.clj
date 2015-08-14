@@ -107,7 +107,7 @@
   (not (= nil (o :one-of))))
 
 (defn my-platform? [o]
-  (or (= util/get-my-platform (o :platform)) (= (o :platform "all"))))
+  (or (= (util/get-my-platform) (o :platform)) (= (o :platform) "all")))
 
 (defn is-dep? [o] (and (not (is-one-of? o)) (my-platform? o)))
 
