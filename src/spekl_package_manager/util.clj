@@ -59,3 +59,11 @@
     ))
 
 
+(defn get-open-command [file]
+  (let [platform (get-my-platform)]
+    (case platform
+      "windows" (list "cmd" "/c" "start" file) 
+      "linux"   (list "xdg-open" file)
+      "osx"     (list "open" file)
+      nil
+      )))
