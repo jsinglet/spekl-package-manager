@@ -1,8 +1,8 @@
 <project>
     <shortName>spm</shortName>
     <fullName>The Spekl Package Manager</fullName>
-    <version>0.0.5</version>
-    <licenseFile>C:/Users/jls/Projects/spekl-package-manager/LICENSE</licenseFile>
+    <version>0.0.8</version>
+    <licenseFile>../LICENSE</licenseFile>
     <componentList>
         <component>
             <name>default</name>
@@ -73,7 +73,7 @@
                             <origin>spm</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>../target/uberjar/spekl-package-manager-*-SNAPSHOT-standalone.jar</origin>
+                            <origin>../target/uberjar/spekl-package-manager-0.1.0-SNAPSHOT-standalone.jar</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
@@ -124,7 +124,22 @@ SET PATH=${installdir}\tools\Git\bin;%PATH%
                     <files>${installdir}/*</files>
                     <group>root</group>
                     <owner>root</owner>
+                    <ruleList>
+                        <platformTest>
+                            <negate>1</negate>
+                            <type>osx</type>
+                        </platformTest>
+                    </ruleList>
                 </changeOwnerAndGroup>
+                <writeFile>
+                    <path>/etc/paths.d/spm</path>
+                    <text>${installdir}</text>
+                    <ruleList>
+                        <platformTest>
+                            <type>osx</type>
+                        </platformTest>
+                    </ruleList>
+                </writeFile>
             </postInstallationActionList>
             <startMenuShortcutList>
                 <startMenuShortcut>
@@ -147,6 +162,7 @@ SET PATH=${installdir}\tools\Git\bin;%PATH%
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <installationType>upgrade</installationType>
+    <requireInstallationByRootUser>1</requireInstallationByRootUser>
     <saveRelativePaths>1</saveRelativePaths>
     <vendor>UCF Formal Methods Lab</vendor>
     <licenseFileList>

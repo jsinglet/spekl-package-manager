@@ -15,7 +15,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-windows/*</origin>
+                    <origin>java-windows/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -30,7 +30,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-linux/*</origin>
+                    <origin>java-linux/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -45,7 +45,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-linux-x64/*</origin>
+                    <origin>java-linux-x64/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -60,7 +60,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-solaris-sparc/*</origin>
+                    <origin>java-solaris-sparc/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -75,7 +75,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-solaris-intel/*</origin>
+                    <origin>java-solaris-intel/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
