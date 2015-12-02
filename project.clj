@@ -16,7 +16,7 @@
                  [clj-glob "1.0.0"]
                  [net.n01se/clojure-jna "1.0.0"]
 
-                 [clj-jgit "0.8.9"]
+                 [clj-jgit "0.8.8"]
                  [org.apache.maven/maven-artifact "3.3.3"]
                  [org.slf4j/slf4j-log4j12 "1.7.1"]
                  [log4j/log4j "1.2.17" :exclusions [javax.mail/mail

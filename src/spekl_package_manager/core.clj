@@ -14,7 +14,6 @@
 ;;
 ;; usage: spm [check|publish|refresh] 
 
-
 ;;; Code:
 
 (ns spekl-package-manager.core

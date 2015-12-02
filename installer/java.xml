@@ -90,7 +90,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>C:/Users/jls/Projects/spekl-package-manager/installer/java-osx/*</origin>
+                    <origin>java-osx/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>

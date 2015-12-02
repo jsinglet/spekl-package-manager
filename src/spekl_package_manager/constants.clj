@@ -13,6 +13,7 @@
 (defn spm-package-list [] (str spm-home "static-package-list.json"))
 (defn git-base [] "https://github.com/Spekl/")
 
+(def gh-raw "https://github.com/")
 (def api-raw "https://raw.githubusercontent.com/")
 (def api-all-repos (str "https://api.github.com/orgs/" org-name "/repos"))
 (def api-all-teams (str "https://api.github.com/orgs/" org-name "/teams"))

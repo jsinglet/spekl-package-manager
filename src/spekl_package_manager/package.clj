@@ -44,7 +44,7 @@
     ))
 
 (defn create-package-base-url [package-description]
-  (str constants/api-raw constants/org-name "/" (package-name package-description) ".git" ))
+  (str constants/gh-raw constants/org-name "/" (package-name package-description) ".git" ))
 
 
 ;;
